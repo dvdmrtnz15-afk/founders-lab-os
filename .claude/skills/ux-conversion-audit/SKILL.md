@@ -2,22 +2,22 @@
 
 Use this when reviewing a landing page, onboarding flow, product entry screen, or consumer-facing app.
 
-Audit:
+Checklist:
 
-1. Five-second comprehension
-2. Hero clarity
-3. CTA clarity
-4. Mobile-first layout
-5. Signup timing
-6. Friction before value
-7. Trust signals
-8. Demo visibility
-9. Visual hierarchy
-10. Conversion path
+1. Confirm five-second comprehension.
+2. Verify hero clarity and messaging.
+3. Ensure CTA clarity and prominence.
+4. Validate mobile-first layout and touch targets.
+5. Review signup timing and flow.
+6. Reduce friction before demonstrating value.
+7. Check for clear trust signals.
+8. Surface demo or trial visibility.
+9. Confirm visual hierarchy supports conversion.
+10. Map and test the conversion path.
 
 Rules:
 
 - Users should understand the app before authentication.
-- Avoid login walls before value demonstration.
-- Show capability clearly without overwhelming.
+- Avoid login walls before demonstrating value.
+- Show capability clearly without overwhelming users.
 - Prioritize founder-grade polish over generic templates.

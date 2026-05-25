@@ -1,23 +1,22 @@
 # Security Audit Skill
 
-Use this before auth, billing, APIs, uploads, data handling, or production.
+Use this before working on auth, billing, APIs, uploads, data handling, or production systems.
 
-Inspect:
+Process:
 
-- Environment file access
-- Secrets leakage
-- Client/server data boundaries
-- Input validation
-- API routes
-- Server actions
-- Logging risk
-- Dependency risk
-- Auth/session assumptions
-- Payment or customer-data exposure
+- Check environment file access.
+- Look for secrets leakage.
+- Verify client/server data boundaries.
+- Validate input handling and sanitization.
+- Review API routes and server actions.
+- Assess logging for sensitive data exposure.
+- Evaluate dependency security risk.
+- Confirm auth/session assumptions.
+- Check for payment or customer-data exposure.
 
 Rules:
 
-- Never read .env unless explicitly authorized.
-- Never print secrets.
-- Never weaken security for convenience.
-- Flag uncertainty clearly.
+- Do not read `.env` files unless explicitly authorized.
+- Do not print secrets.
+- Do not weaken security for convenience.
+- Flag uncertainty or unknowns clearly.

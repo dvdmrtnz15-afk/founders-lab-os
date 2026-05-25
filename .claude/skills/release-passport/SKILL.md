@@ -2,19 +2,19 @@
 
 Use this before deployment, demo, investor review, or major handoff.
 
-Include:
+Checklist:
 
-1. What changed
-2. Why it changed
-3. Files changed
-4. Commands run
-5. Build result
-6. Known risks
-7. Rollback plan
-8. User-facing impact
-9. Production blockers
-10. Approval status
+1. Summarize what changed.
+2. Explain why it changed.
+3. List files changed.
+4. Record commands run.
+5. Attach build result and status.
+6. Note known risks.
+7. Provide a rollback plan.
+8. Describe user-facing impact.
+9. Identify any production blockers.
+10. State approval status.
 
 Hard rule:
 
-Do not deploy. Produce the passport only unless explicitly approved.
+Do not deploy; produce the release passport only unless deployment is explicitly approved.

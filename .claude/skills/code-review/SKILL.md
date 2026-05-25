@@ -2,23 +2,23 @@
 
 Use this skill to audit code before continuing development.
 
-Review:
+Process:
 
-1. Correctness
-2. Type safety
-3. Next.js conventions
-4. Security
-5. Performance
-6. UX clarity
-7. Mobile behavior
-8. Maintainability
-9. Test/build confidence
-10. Reversibility
+1. Check correctness.
+2. Verify type safety.
+3. Validate Next.js conventions.
+4. Review security considerations.
+5. Assess performance impacts.
+6. Confirm UX clarity.
+7. Test mobile behavior.
+8. Evaluate maintainability and code structure.
+9. Verify tests and build confidence.
+10. Confirm reversibility and rollback options.
 
 Output:
 
-- Critical issues
-- Important issues
-- Nice-to-have improvements
-- Suggested patch plan
-- Commands to run
+- Critical issues.
+- Important issues.
+- Nice-to-have improvements.
+- Suggested patch plan with steps.
+- Commands to run for verification.
