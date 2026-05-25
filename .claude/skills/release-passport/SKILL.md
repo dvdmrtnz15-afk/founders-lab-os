@@ -11,7 +11,7 @@ Checklist:
 5. Attach build result and status.
 6. Note known risks.
 7. Provide a rollback plan.
-8. Describe user-facing impact.
+8. Describe user-facing impact required: state impact level none partial outage, affected features and platforms, estimated percent of users affected, and expected duration.
 9. Identify any production blockers.
 10. State approval status.
 
