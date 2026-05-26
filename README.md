@@ -1,8 +1,9 @@
 # founders-lab-os
 
-Private AI founder lab for a composer-first build cockpit: VS Code meets Codex
-for governed agent workflows, local model routing, GitHub checkpoints, product
-audits, monetization systems, and reusable build playbooks.
+Private AI founder lab for a composer-first build cockpit: VS Code meets Cursor
+meets Replit, with Codex-grade governed agent workflows, local model routing,
+GitHub checkpoints, product audits, monetization systems, and reusable build
+playbooks.
 
 ## Operating Model
 
