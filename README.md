@@ -1,7 +1,8 @@
 # founders-lab-os
 
-Private AI founder lab for governed agent workflows, local model routing,
-product audits, monetization systems, and reusable build playbooks.
+Private AI founder lab for a composer-first build cockpit: VS Code meets Codex
+for governed agent workflows, local model routing, GitHub checkpoints, product
+audits, monetization systems, and reusable build playbooks.
 
 ## Operating Model
 
@@ -10,8 +11,9 @@ This repo is the main Mac-first FounderLab cockpit:
 ```txt
 MacBook Pro
   -> VS Code
+  -> GitHub Copilot inline assistance
   -> Claude Code governed edits
-  -> Continue autocomplete
+  -> Continue local model chat/edit/apply
   -> Roo Code local experiments
   -> Ollama model lane
   -> iPhone QA
@@ -56,6 +58,11 @@ Hard gates:
 - Do not deploy production without explicit approval.
 - Do not add dependencies without approval.
 - Do not let multiple agents edit at the same time.
+- Keep Copilot as an inline assistant; use Continue/Ollama for private local
+  model reasoning and Claude Code/Codex for governed repo changes.
+- Before using the ChatGPT GitHub connector, check
+  `docs/codex/github-connector-visibility.md`; the current connector may not
+  expose this repo.
 
 ## Stack
 
