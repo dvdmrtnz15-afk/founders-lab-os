@@ -18,10 +18,24 @@ const contextStack = [
 ];
 
 const composerModes = [
-  ["Plan", "gemma4:e4b", "Shape the task"],
+  ["Plan", "gemma4:e4b", "Scope before edits"],
   ["Build", "qwen3.6:27b", "Patch with context"],
   ["Copilot", "GitHub", "Inline assist"],
   ["Ship", "PR + Vercel", "Prepare handoff"],
+];
+
+const uploadSources = [
+  ["Files", "Upload specs, screenshots, notes"],
+  ["Repo", "Attach folders, files, or diff"],
+  ["URL", "Import docs, issue, preview"],
+  ["Image", "Design reference or bug shot"],
+];
+
+const planSteps = [
+  ["Understand", "Read attached context and repo state"],
+  ["Propose", "Draft the smallest useful implementation plan"],
+  ["Approve", "Wait for human approval before edits"],
+  ["Execute", "Patch, run checks, preview, summarize"],
 ];
 
 const runSteps = [
@@ -163,7 +177,7 @@ export default function Home() {
                     Composer Core
                   </p>
                   <h2 className="text-2xl font-semibold">
-                    Ask, edit, preview, ship from one command surface.
+                    Plan, upload context, build, preview, ship.
                   </h2>
                 </div>
                 <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
@@ -196,29 +210,108 @@ export default function Home() {
               <section className="flex flex-col rounded-md border border-slate-300 bg-white shadow-sm">
                 <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
                   <div>
-                    <p className="text-sm font-semibold">AI Composer</p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="text-sm font-semibold">Agent Composer</p>
+                      <span className="rounded-md bg-emerald-100 px-2 py-1 font-mono text-[0.68rem] font-semibold uppercase text-emerald-800">
+                        Plan mode on
+                      </span>
+                    </div>
                     <p className="text-xs text-slate-500">
-                      Cursor-style instruction box with Codex execution rules.
+                      Replit-agent style planning with Codex execution rules.
                     </p>
                   </div>
-                  <button
-                    className="rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white"
-                    type="button"
-                  >
-                    Run Task
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700"
+                      type="button"
+                    >
+                      Upload
+                    </button>
+                    <button
+                      className="rounded-md bg-slate-950 px-3 py-2 text-sm font-semibold text-white"
+                      type="button"
+                    >
+                      Generate Plan
+                    </button>
+                  </div>
                 </div>
-                <textarea
-                  className="min-h-72 flex-1 resize-none border-0 bg-[#fbfcfd] p-4 text-base leading-7 outline-none"
-                  defaultValue={
-                    "Build this like VS Code meets Cursor meets Replit. Keep the composer at the center, use local frontier models for private reasoning, use Copilot for inline code flow, run checks, then prepare the GitHub PR checkpoint."
-                  }
-                />
-                <div className="grid gap-2 border-t border-slate-200 bg-slate-50 p-3 md:grid-cols-3">
+
+                <div className="grid flex-1 gap-0 lg:grid-cols-[minmax(0,1fr)_18rem]">
+                  <div className="flex min-h-96 flex-col">
+                    <textarea
+                      className="min-h-56 flex-1 resize-none border-0 bg-[#fbfcfd] p-4 text-base leading-7 outline-none"
+                      defaultValue={
+                        "Plan this before editing: make Founders Lab OS feel like a coder's agent workspace with uploadable context, plan approval, live preview, terminal checks, GitHub handoff, and local Ollama launch agents."
+                      }
+                    />
+                    <div className="border-t border-slate-200 bg-white p-3">
+                      <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                        {uploadSources.map(([label, value]) => (
+                          <button
+                            className="rounded-md border border-dashed border-slate-300 bg-slate-50 px-3 py-3 text-left hover:border-emerald-400 hover:bg-emerald-50"
+                            key={label}
+                            type="button"
+                          >
+                            <span className="block text-xs font-semibold uppercase text-slate-500">
+                              {label}
+                            </span>
+                            <span className="mt-1 block text-sm leading-5 text-slate-800">
+                              {value}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <aside className="border-t border-slate-200 bg-slate-50 p-4 lg:border-l lg:border-t-0">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold">Plan Preview</h3>
+                      <span className="rounded-md bg-amber-100 px-2 py-1 font-mono text-[0.68rem] text-amber-800">
+                        approval required
+                      </span>
+                    </div>
+                    <div className="mt-4 space-y-3">
+                      {planSteps.map(([step, detail], index) => (
+                        <div
+                          className="rounded-md border border-slate-200 bg-white p-3"
+                          key={step}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="grid h-6 w-6 place-items-center rounded-md bg-slate-900 font-mono text-xs text-white">
+                              {index + 1}
+                            </span>
+                            <p className="text-sm font-semibold">{step}</p>
+                          </div>
+                          <p className="mt-2 text-xs leading-5 text-slate-600">
+                            {detail}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 grid grid-cols-2 gap-2">
+                      <button
+                        className="rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-semibold"
+                        type="button"
+                      >
+                        Refine
+                      </button>
+                      <button
+                        className="rounded-md bg-emerald-500 px-3 py-2 text-sm font-semibold text-slate-950"
+                        type="button"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                  </aside>
+                </div>
+
+                <div className="grid gap-2 border-t border-slate-200 bg-slate-50 p-3 md:grid-cols-4">
                   {[
-                    ["Attach", "file, folder, diff"],
-                    ["Select Model", "gemma4 / qwen3.6"],
-                    ["Output", "plan, patch, preview, PR"],
+                    ["Mode", "Plan before build"],
+                    ["Context", "uploads + repo"],
+                    ["Model", "gemma4 -> qwen3.6"],
+                    ["Result", "plan, patch, preview, PR"],
                   ].map(([label, value]) => (
                     <button
                       className="rounded-md border border-slate-300 bg-white px-3 py-2 text-left"

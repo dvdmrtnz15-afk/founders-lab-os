@@ -45,6 +45,18 @@ Open phone preview from the same Wi-Fi:
 http://YOUR-MAC-IP:3000
 ```
 
+## Composer Experience
+
+The core surface should feel like VS Code meets Cursor meets Replit Agent:
+
+- Plan mode is first-class: understand, propose, wait for approval, execute.
+- Uploadable context is visible in the composer: files, repo slices, URLs,
+  screenshots, specs, issues, and preview evidence.
+- The composer owns intent, plan approval, model routing, terminal checks, live
+  preview, GitHub handoff, and PR preparation.
+- The right rail keeps ship controls close: local launch agents, Copilot, GitHub,
+  Vercel preview, and production approval gates.
+
 ## Governance
 
 - `.claude/CLAUDE.md` is the repo operating constitution.
