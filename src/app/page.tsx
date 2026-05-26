@@ -49,6 +49,13 @@ const modelRoutes = [
   ["Memory", "nomic-embed-text"],
 ];
 
+const localLaunchAgents = [
+  ["Codex", "ollama launch codex", "repo edits and task execution"],
+  ["Claude", "ollama launch claude", "architecture and review lane"],
+  ["Codex App", "ollama launch codex-app", "desktop cockpit orchestration"],
+  ["Hermes", "ollama launch hermes", "fast local coordination"],
+];
+
 export default function Home() {
   return (
     <main className="min-h-screen bg-[#eceff3] text-slate-950">
@@ -312,6 +319,17 @@ export default function Home() {
                       </span>
                     </div>
                   ))}
+                  {localLaunchAgents.map(([agent, command]) => (
+                    <div
+                      className="flex items-center justify-between gap-3 rounded-md bg-emerald-400/10 px-3 py-2"
+                      key={agent}
+                    >
+                      <span className="text-xs text-emerald-100">{agent}</span>
+                      <span className="font-mono text-xs text-emerald-200">
+                        {command}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </section>
@@ -328,6 +346,33 @@ export default function Home() {
             </div>
 
             <div className="space-y-4 p-4">
+              <section className="rounded-md border border-emerald-300 bg-emerald-50 p-4">
+                <h3 className="font-semibold">Ollama Launch Agents</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-700">
+                  Local agent launch commands sit next to the composer so the
+                  cockpit can route work into the right lane.
+                </p>
+                <div className="mt-4 space-y-2">
+                  {localLaunchAgents.map(([agent, command, role]) => (
+                    <button
+                      className="w-full rounded-md border border-emerald-200 bg-white px-3 py-2 text-left"
+                      key={agent}
+                      type="button"
+                    >
+                      <span className="block text-sm font-semibold">
+                        {agent}
+                      </span>
+                      <span className="mt-1 block font-mono text-xs text-emerald-700">
+                        {command}
+                      </span>
+                      <span className="mt-1 block text-xs text-slate-500">
+                        {role}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+
               <section className="rounded-md border border-slate-300 bg-slate-50 p-4">
                 <h3 className="font-semibold">GitHub</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-600">

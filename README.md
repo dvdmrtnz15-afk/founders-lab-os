@@ -17,6 +17,7 @@ MacBook Pro
   -> Continue local model chat/edit/apply
   -> Roo Code local experiments
   -> Ollama model lane
+  -> Ollama launch agents
   -> iPhone QA
   -> GitHub checkpoint
   -> Vercel preview
@@ -61,6 +62,9 @@ Hard gates:
 - Do not let multiple agents edit at the same time.
 - Keep Copilot as an inline assistant; use Continue/Ollama for private local
   model reasoning and Claude Code/Codex for governed repo changes.
+- Local launch agents are explicit cockpit lanes: `ollama launch codex`,
+  `ollama launch claude`, `ollama launch codex-app`, and
+  `ollama launch hermes`.
 - Before using the ChatGPT GitHub connector, check
   `docs/codex/github-connector-visibility.md`; the current connector may not
   expose this repo.
