@@ -59,8 +59,18 @@ The core surface should feel like VS Code meets Cursor meets Replit Agent:
 
 ## Governance
 
+- `AGENTS.md` is the Codex/agent operating constitution.
 - `.claude/CLAUDE.md` is the repo operating constitution.
 - `.claude/settings.json` keeps Claude Code in plan-first mode.
+- `agents/` contains specialist role instructions for product, architecture,
+  repo cartography, frontend, backend, data, security, QA, DevOps, review, and
+  docs work.
+- `skills/` contains task-specific procedures for repo audit, implementation
+  planning, frontend surfacing, API contracts, RBAC, security review, code
+  review, and release verification.
+- `docs/product`, `docs/architecture`, `docs/design`, `docs/data`, `docs/api`,
+  `docs/security`, `docs/testing`, and `docs/ops` define the software-factory
+  baselines agents must maintain.
 - `.claude/skills` contains feature, review, security, UX, and release workflows.
 - `docs/receipts/agent-edits.jsonl` stores agent edit receipts.
 - Durable cross-project memory lives in `~/FounderLab/memory`.
