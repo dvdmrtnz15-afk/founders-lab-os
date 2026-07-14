@@ -22,6 +22,18 @@ Declare the routing tier before work:
 Escalate secrets, auth, payments, production deploys, and compliance-sensitive
 work for explicit human review before touching files.
 
+## TET Noesis Governance
+
+Use `skills/govern-tet-noesis/SKILL.md` and the
+`agents/noesis-governor.agent.md` role for consequential, uncertainty-heavy,
+cross-system, destructive, persistent-memory, or self-improvement work. Require
+a proof-gated `ALLOW`, an active scoped capability lease, independent
+verification proportional to risk, and an execution receipt before claiming a
+bounded action succeeded.
+
+The Noesis workflow adds a warrant gate; it never replaces the stricter rule in
+this constitution or grants authority the operator did not provide.
+
 ## Required Pre-Code Output
 
 No meaningful code change starts until the agent has produced:

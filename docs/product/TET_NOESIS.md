@@ -59,6 +59,22 @@ A production implementation should add capabilities in this order:
 
 Each step requires a separate threat-model, RBAC, data, API, and test update.
 
+## Repo-native operator package
+
+The public repository includes a generic Noesis package for agent runtimes and
+coding assistants:
+
+- `skills/govern-tet-noesis/SKILL.md` defines the warranted-autonomy workflow,
+  stop conditions, and decision envelope.
+- `skills/govern-tet-noesis/references/warrant-contract.md` defines proportional
+  warrant levels, evidence objects, capability leases, and receipts.
+- `agents/noesis-governor.agent.md` defines the reusable governor role.
+
+Invoke the skill for consequential or uncertainty-heavy work. It permits a
+bounded action only after canonical state, sufficient proof, authorization, an
+independent verifier, and an active semantic capability lease are present. It
+does not bypass host-platform confirmation, repository policy, or human review.
+
 ## Research context
 
 The design treats external verification as a requirement rather than trusting

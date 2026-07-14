@@ -7,6 +7,9 @@
 - Added the TET Noesis public reference workbench, deterministic warrant
   evaluator, machine-readable agent contract, product boundary, and responsive
   cockpit entry point.
+- Added a generic `govern-tet-noesis` skill, warrant contract, and Noesis
+  Governor agent profile for proof-gated decisions, scoped capability leases,
+  verified execution, governed memory, and offline improvement.
 - Added the Agentic Software Factory OS starter pack: root `AGENTS.md`,
   specialist agent roles, task skills, product docs, architecture docs, design
   maps, data/API/security/testing/ops baselines, PR template, issue templates,
