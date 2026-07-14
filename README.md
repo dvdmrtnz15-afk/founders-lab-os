@@ -1,101 +1,123 @@
-# founders-lab-os
+# FounderLab OS
 
-Private AI founder lab for a composer-first build cockpit: VS Code meets Cursor
-meets Replit, with Codex-grade governed agent workflows, local model routing,
-GitHub checkpoints, product audits, monetization systems, and reusable build
-playbooks.
+FounderLab OS is a public-source, local-first build cockpit for governed AI
+agent workflows. It turns planning, repository evidence, model routing,
+verification, preview checks, GitHub handoff, and release gates into one visible
+operating surface.
 
-## Operating Model
+> Status: reference implementation. The current UI demonstrates the operating
+> model; it does not execute production actions or provide a persistent agent
+> backend.
 
-This repo is the main Mac-first FounderLab cockpit:
+## Why it exists
 
-```txt
-MacBook Pro
-  -> VS Code
-  -> GitHub Copilot inline assistance
-  -> Claude Code governed edits
-  -> Continue local model chat/edit/apply
-  -> Roo Code local experiments
-  -> Ollama model lane
-  -> Ollama launch agents
-  -> iPhone QA
-  -> GitHub checkpoint
-  -> Vercel preview
-  -> production only after review
+AI coding tools are fast, but speed without evidence creates duplicate features,
+hidden backend behavior, unsafe releases, and weak handoffs. FounderLab OS keeps
+the important control points visible:
+
+- map the repository before editing;
+- separate proposals from permission to act;
+- expose uncertainty and the blocking subproblem;
+- require independent verification for consequential actions;
+- keep production, secrets, auth, payments, and destructive actions gated;
+- leave a receipt that explains what changed, what passed, and how to roll back.
+
+## TET Noesis™ preview
+
+`/noesis` is an interactive reference workbench for warranted autonomy:
+
+> Think recursively. Know what is uncertain. Act only with proof.
+
+The preview demonstrates canonical state, calibrated uncertainty,
+impasse-driven recursion, an evidence ledger, independent verification,
+semantic capability leases, TET Resolve, governed memory, and execution
+receipts. It runs entirely in the browser with sample state and performs no
+external action.
+
+The public reference contract is available at
+[`public/tet-noesis-contract.yaml`](public/tet-noesis-contract.yaml), with the
+product boundary documented in
+[`docs/product/TET_NOESIS.md`](docs/product/TET_NOESIS.md).
+
+## Quick start
+
+Requirements:
+
+- Node.js 20 or newer
+- pnpm 9 or newer
+
+```bash
+git clone https://github.com/dvdmrtnz15-afk/founders-lab-os.git
+cd founders-lab-os
+pnpm install
+pnpm dev
 ```
 
-## Daily Loop
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The Noesis workbench is at
+[http://127.0.0.1:3000/noesis](http://127.0.0.1:3000/noesis).
+
+For phone QA on the same network:
+
+```bash
+pnpm dev:phone
+```
+
+Then open `http://YOUR_MAC_IP:3000` from the device.
+
+## Validation loop
 
 ```bash
 pnpm format:check
 pnpm lint
 pnpm build
-pnpm dev:phone
 ```
 
-Open local preview:
+## Repository map
 
-```txt
-http://127.0.0.1:3000
+```text
+src/app/          Next.js routes and visible product surfaces
+src/lib/          Deterministic domain logic
+agents/           Specialist agent role instructions
+skills/           Repo-native task procedures
+docs/product/     Product intent and acceptance criteria
+docs/architecture Architecture decisions and system boundaries
+docs/design/      Route, component, and UX inventories
+docs/security/    Threat, secrets, auth, and RBAC policies
+docs/testing/     Test strategy and future test layers
+docs/ops/         Release, observability, and runbook baselines
 ```
-
-Open phone preview from the same Wi-Fi:
-
-```txt
-http://YOUR-MAC-IP:3000
-```
-
-## Composer Experience
-
-The core surface should feel like VS Code meets Cursor meets Replit Agent:
-
-- Plan mode is first-class: understand, propose, wait for approval, execute.
-- Uploadable context is visible in the composer: files, repo slices, URLs,
-  screenshots, specs, issues, and preview evidence.
-- The composer owns intent, plan approval, model routing, terminal checks, live
-  preview, GitHub handoff, and PR preparation.
-- The right rail keeps ship controls close: local launch agents, Copilot, GitHub,
-  Vercel preview, and production approval gates.
 
 ## Governance
 
-- `AGENTS.md` is the Codex/agent operating constitution.
-- `.claude/CLAUDE.md` is the repo operating constitution.
-- `.claude/settings.json` keeps Claude Code in plan-first mode.
-- `agents/` contains specialist role instructions for product, architecture,
-  repo cartography, frontend, backend, data, security, QA, DevOps, review, and
-  docs work.
-- `skills/` contains task-specific procedures for repo audit, implementation
-  planning, frontend surfacing, API contracts, RBAC, security review, code
-  review, and release verification.
-- `docs/product`, `docs/architecture`, `docs/design`, `docs/data`, `docs/api`,
-  `docs/security`, `docs/testing`, and `docs/ops` define the software-factory
-  baselines agents must maintain.
-- `.claude/skills` contains feature, review, security, UX, and release workflows.
-- `docs/receipts/agent-edits.jsonl` stores agent edit receipts.
-- Durable cross-project memory lives in `~/FounderLab/memory`.
+Start with [`AGENTS.md`](AGENTS.md). Its non-negotiable flow is:
+
+```text
+intent -> repo map -> architecture/UI/data/security impact -> plan
+       -> implementation -> verification -> receipt -> human-gated release
+```
 
 Hard gates:
 
-- Do not read `.env` files without explicit approval.
-- Do not push to GitHub without explicit approval.
-- Do not deploy production without explicit approval.
-- Do not add dependencies without approval.
-- Do not let multiple agents edit at the same time.
-- Keep Copilot as an inline assistant; use Continue/Ollama for private local
-  model reasoning and Claude Code/Codex for governed repo changes.
-- Local launch agents are explicit cockpit lanes: `ollama launch codex`,
-  `ollama launch claude`, `ollama launch codex-app`, and
-  `ollama launch hermes`.
-- Before using the ChatGPT GitHub connector, check
-  `docs/codex/github-connector-visibility.md`; the current connector may not
-  expose this repo.
+- never read or expose real secrets;
+- never add a dependency without explaining and approving it;
+- never change auth, payments, production, or user-data boundaries casually;
+- never push or deploy without explicit approval;
+- never claim completion without running the relevant checks;
+- use a preview before production and keep rollback evidence.
 
-## Stack
+The model names and launch commands shown in the cockpit are adapter examples,
+not runtime requirements. Replace them with the local or hosted model profiles
+appropriate to your environment.
 
-- Next.js App Router
-- TypeScript
-- Tailwind CSS
-- ESLint
-- Prettier
-- pnpm
+## Contributing and security
+
+- Read [`CONTRIBUTING.md`](CONTRIBUTING.md) before proposing changes.
+- Use the issue templates for bugs, features, and architecture changes.
+- Report vulnerabilities through the private process in
+  [`SECURITY.md`](SECURITY.md), not a public issue.
+
+## License
+
+No software license has been selected yet. Public visibility alone does not
+grant permission to copy, modify, or redistribute the project. A license should
+be chosen deliberately before describing this repository as open source.

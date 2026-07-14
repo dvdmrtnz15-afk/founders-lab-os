@@ -25,6 +25,7 @@ files, hidden backend features, broken UI paths, weak tests, and security drift.
 - Specialist agent instructions.
 - Skill-based task procedures.
 - Product, architecture, design, data, API, security, testing, and ops docs.
+- A visible TET Noesis reference workbench for proof-gated agent decisions.
 
 ## Non-Goals
 
@@ -32,6 +33,8 @@ files, hidden backend features, broken UI paths, weak tests, and security drift.
 - Reading secrets or production data.
 - Deploying directly to production.
 - Building a complete enterprise SDLC platform before product validation.
+- Presenting a client-side reference workbench as a persistent autonomous
+  runtime.
 
 ## Acceptance Criteria
 

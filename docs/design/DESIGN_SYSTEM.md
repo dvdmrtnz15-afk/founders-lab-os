@@ -16,3 +16,14 @@ scannable, restrained, and action-oriented.
 - Compact cards and panels with `rounded-md`.
 - Monospace labels for system state and commands.
 - Dashboard-style sections for planning, preview, terminal, and release control.
+
+## Noesis Extension
+
+- Forensic instrument-panel treatment on deep green-black surfaces.
+- Square evidence modules and a circular proof-coverage signal.
+- Emerald indicates verified permission; amber indicates a held action; rose
+  indicates a denied warrant.
+- Space Grotesk carries the interface hierarchy and IBM Plex Mono carries
+  evidence, state, and machine-readable labels.
+- Motion is limited to interaction feedback; the decision state must remain
+  stable and scannable.

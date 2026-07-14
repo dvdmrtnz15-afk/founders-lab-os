@@ -1,8 +1,9 @@
 # Route Map
 
-| Route | Purpose               | Owner          | Notes                   |
-| ----- | --------------------- | -------------- | ----------------------- |
-| `/`   | FounderLab cockpit UI | Frontend Agent | Current primary surface |
+| Route     | Purpose                                 | Owner          | Notes                                       |
+| --------- | --------------------------------------- | -------------- | ------------------------------------------- |
+| `/`       | FounderLab cockpit UI                   | Frontend Agent | Primary local build surface                 |
+| `/noesis` | TET Noesis warranted-autonomy workbench | Frontend Agent | Client-side reference preview; no execution |
 
 ## Rule
 
