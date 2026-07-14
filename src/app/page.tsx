@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const activityItems = [
   ["EX", "Explorer"],
   ["SR", "Search"],
@@ -8,9 +10,9 @@ const activityItems = [
 
 const workspaceFiles = [
   ["src/app/page.tsx", "active", "UI"],
-  ["src/app/globals.css", "idle", "CSS"],
-  ["docs/codex/github-connector-visibility.md", "changed", "DOC"],
-  ["docs/memory/local-model-inventory.md", "idle", "MD"],
+  ["src/app/noesis/page.tsx", "changed", "UI"],
+  ["src/lib/noesis.ts", "changed", "TS"],
+  ["docs/product/TET_NOESIS.md", "changed", "DOC"],
   ["README.md", "changed", "MD"],
 ];
 
@@ -24,10 +26,10 @@ const contextStack = [
 ];
 
 const composerModes = [
-  ["Plan", "gemma4:e4b", "Scope before edits", "active"],
-  ["Build", "qwen3.6:27b", "Patch with context", "ready"],
-  ["Review", "claude lane", "Architecture pass", "ready"],
-  ["Ship", "PR + Vercel", "Prepare handoff", "gated"],
+  ["Plan", "reasoning lane", "Scope before edits", "active"],
+  ["Build", "code lane", "Patch with context", "ready"],
+  ["Verify", "independent lane", "Check the evidence", "ready"],
+  ["Ship", "PR + preview", "Prepare handoff", "gated"],
 ];
 
 const uploadSources = [
@@ -71,11 +73,11 @@ const terminalLines = [
 ];
 
 const modelRoutes = [
-  ["Composer", "gemma4:e4b", "planning"],
-  ["Deep edit", "qwen3.6:27b", "implementation"],
-  ["Fast code", "qwen2.5-coder:7b", "snippets"],
-  ["Inline", "Copilot", "completion"],
-  ["Memory", "nomic-embed-text", "retrieval"],
+  ["Composer", "reasoning profile", "planning"],
+  ["Deep edit", "code profile", "implementation"],
+  ["Fast code", "local profile", "snippets"],
+  ["Verifier", "separate profile", "evidence"],
+  ["Memory", "retrieval profile", "grounding"],
 ];
 
 const localLaunchAgents = [
@@ -96,7 +98,7 @@ const commandBar = [
 ];
 
 const statusItems = [
-  ["branch", "pr/commit-current-founders-lab-os"],
+  ["branch", "main / feature branch"],
   ["checks", "green"],
   ["model", "local"],
   ["preview", "127.0.0.1:3000"],
@@ -106,15 +108,15 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#dfe4ea] text-slate-950">
       <section className="mx-auto flex min-h-screen w-full max-w-[1840px] flex-col border-x border-slate-300 bg-[#f5f7fa] shadow-2xl shadow-slate-400/20">
-        <header className="flex h-12 items-center justify-between border-b border-slate-300 bg-[#172033] px-3 text-white">
+        <header className="flex min-h-12 items-center justify-between border-b border-slate-300 bg-[#172033] px-3 py-2 text-white">
           <div className="flex min-w-0 items-center gap-3">
             <div className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-emerald-400 text-sm font-bold text-slate-950">
               FL
             </div>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold">Founders Lab OS</p>
-              <p className="truncate font-mono text-[0.68rem] text-slate-300">
-                VS Code shell / Cursor composer / Replit run loop
+              <p className="truncate text-sm font-semibold">FounderLab OS</p>
+              <p className="hidden truncate font-mono text-[0.68rem] text-slate-300 sm:block">
+                governed local-first build cockpit
               </p>
             </div>
           </div>
@@ -124,21 +126,27 @@ export default function Home() {
                 cmd+k
               </span>
               <span className="truncate text-sm text-slate-200">
-                Ask Codex to plan, upload context, run checks, prepare PR...
+                Plan, attach evidence, verify, preview, and prepare a safe
+                handoff...
               </span>
             </div>
           </div>
-          <div className="hidden items-center gap-2 md:flex">
-            {["Localhost :3000", "GitHub gated", "Vercel preview"].map(
-              (item) => (
-                <span
-                  className="rounded-md border border-white/10 bg-white/10 px-2.5 py-1 font-mono text-xs text-slate-200"
-                  key={item}
-                >
-                  {item}
-                </span>
-              ),
-            )}
+          <div className="flex items-center gap-2">
+            <Link
+              className="rounded-md bg-emerald-300 px-2.5 py-1 font-mono text-xs font-semibold text-slate-950 transition hover:bg-emerald-200"
+              href="/noesis"
+            >
+              <span className="sm:hidden">Noesis</span>
+              <span className="hidden sm:inline">Open TET Noesis</span>
+            </Link>
+            {["Local-first", "GitHub gated"].map((item) => (
+              <span
+                className="hidden rounded-md border border-white/10 bg-white/10 px-2.5 py-1 font-mono text-xs text-slate-200 xl:inline-flex"
+                key={item}
+              >
+                {item}
+              </span>
+            ))}
           </div>
         </header>
 
@@ -168,7 +176,7 @@ export default function Home() {
                 Workspace
               </p>
               <h1 className="mt-1 text-lg font-semibold leading-6">
-                Builder cockpit for founder-grade shipping.
+                A governed cockpit anyone can run locally.
               </h1>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {["Files", "Tasks", "Memory"].map((item, index) => (
@@ -287,7 +295,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex min-w-0 items-center gap-1 border-b border-slate-300 bg-[#f8fafc] px-3">
+            <div className="flex min-w-0 items-center gap-1 overflow-x-auto border-b border-slate-300 bg-[#f8fafc] px-3">
               {openTabs.map((tab, index) => (
                 <button
                   className={`h-10 border-x border-t px-3 text-sm ${
@@ -317,8 +325,8 @@ export default function Home() {
                       </span>
                     </div>
                     <p className="mt-1 text-xs text-slate-500">
-                      Replit-agent style planning with Codex execution rules and
-                      IDE-grade context.
+                      Plan-first orchestration with visible evidence, execution
+                      gates, and IDE-grade context.
                     </p>
                   </div>
                   <div className="grid grid-cols-2 gap-2 sm:flex">
@@ -361,7 +369,7 @@ export default function Home() {
                     <textarea
                       className="min-h-60 flex-1 resize-none border-0 bg-[#fbfcfd] p-4 text-base leading-7 outline-none"
                       defaultValue={
-                        "Create the next UX/UI pass: make the core composer feel like a professional coding agent surface with uploadable context, plan approval, live preview, terminal checks, GitHub handoff, local model routing, and clear ship gates."
+                        "Plan a scoped change. Map the repository, name uncertainty, identify evidence, isolate the blocker, verify independently, run checks, and prepare a reversible handoff with a receipt."
                       }
                     />
                     <div className="border-t border-slate-200 bg-white p-3">
@@ -433,8 +441,8 @@ export default function Home() {
                   {[
                     ["Mode", "Plan before build"],
                     ["Context", "uploads + repo"],
-                    ["Model", "gemma4 -> qwen3.6"],
-                    ["Result", "plan, patch, preview, PR"],
+                    ["Routing", "reason -> code -> verify"],
+                    ["Result", "plan, patch, proof, receipt"],
                   ].map(([label, value]) => (
                     <button
                       className="rounded-md border border-slate-300 bg-white px-3 py-2 text-left transition hover:border-slate-400"

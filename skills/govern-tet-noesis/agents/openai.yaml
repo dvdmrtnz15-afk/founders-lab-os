@@ -1,0 +1,4 @@
+interface:
+  display_name: "Govern TET Noesis"
+  short_description: "Proof-gated agent decisions and execution"
+  default_prompt: "Use $govern-tet-noesis to turn this objective into a proof-gated decision and execution receipt."
