@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "A public-source, local-first cockpit for governed agent workflows and proof-gated execution.",
   "private": true,
-  "packageManager": "pnpm@11.3.0",
+  "packageManager": "pnpm@10.34.5",
   "homepage": "https://github.com/dvdmrtnz15-afk/founders-lab-os",
   "repository": {
     "type": "git",

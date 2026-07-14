@@ -87,6 +87,8 @@ Tests Run:
 - `pnpm format:check` passed.
 - `pnpm lint` passed.
 - `pnpm build` passed; `/` and `/noesis` prerendered successfully.
+- `corepack pnpm install --frozen-lockfile` passed with the repository-pinned
+  pnpm 10 release used by CI.
 - Browser interaction passed: held -> narrow recursion -> verifier -> allowed ->
   receipt -> lease revoked -> blocked.
 - Mobile check at 390x844 passed with no horizontal overflow on `/` or

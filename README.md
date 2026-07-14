@@ -44,7 +44,7 @@ product boundary documented in
 Requirements:
 
 - Node.js 20 or newer
-- pnpm 9 or newer
+- Corepack (the repository pins pnpm 10 for Node.js 20 compatibility)
 
 ```bash
 git clone https://github.com/dvdmrtnz15-afk/founders-lab-os.git
