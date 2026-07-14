@@ -1,25 +1,24 @@
 # UI Inventory
 
-## Current UI Surfaces
+## Command Center
 
-- Header: app identity, command prompt, local status gates.
-- Activity rail: IDE-style navigation affordance.
-- Workspace sidebar: files and context stack.
-- Composer core: plan/build/review/ship modes, text area, upload sources.
-- Plan preview: required pre-code loop.
-- Right rail: live preview, run pipeline, terminal, model routes, launch agents.
-- Footer/status strip: branch, checks, model, preview status.
+- Compact header: product identity and one primary harness action.
+- Editorial introduction: product intent and public contract download.
+- Policy posture: canonical state, independent proof, lease, and execution
+  defaults.
+- Three-step operating model: define, prove, decide.
+- Open-source stack disclosure and public repository link.
 
 ## TET Noesis Surface
 
-- Warrant header: decision, proof coverage, uncertainty, recursion depth, and
-  lease state.
-- Canonical state: objective, frozen parent boundary, and blocking subproblem.
-- Evidence ledger: weighted proof status, provenance type, and verifier state.
-- Capability lease: visible scope, tool allowance, budget, and revocation.
-- TET Resolve controls: isolate the blocker, run the verifier, and issue a
-  simulated receipt only after the warrant passes.
-- Controlled sequence: canonicalize, diagnose, recurse, verify, resolve.
+- Sticky workbench header: local-save state, validated import, export, and
+  guarded reset.
+- Definition editor: objective, risk, uncertainty, canonical state, and blocker.
+- Capability lease editor: scope, tools, budget, expiry, approval, and activation.
+- Evidence ledger: editable claim, source, weight, status, and independence.
+- Warrant rail: live proof coverage, policy thresholds, gate state, blockers,
+  narrow recursion, receipt action, and lease reactivation.
+- Audit disclosure: local events and historical receipt count.
 
 ## Maintenance Rule
 

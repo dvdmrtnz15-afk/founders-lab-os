@@ -5,8 +5,9 @@ agent workflows. It turns planning, repository evidence, model routing,
 verification, preview checks, GitHub handoff, and release gates into one visible
 operating surface.
 
-> Status: reference implementation. The current UI demonstrates the operating
-> model; it does not execute production actions or provide a persistent agent
+> Status: operational local harness. The UI authors and validates governed runs,
+> persists a versioned workspace in the browser, and exports portable receipts.
+> It does not execute external or production actions or provide a shared agent
 > backend.
 
 ## Why it exists
@@ -22,17 +23,17 @@ the important control points visible:
 - keep production, secrets, auth, payments, and destructive actions gated;
 - leave a receipt that explains what changed, what passed, and how to roll back.
 
-## TET Noesis™ preview
+## TET Noesis™ harness
 
-`/noesis` is an interactive reference workbench for warranted autonomy:
+`/noesis` is an operational local harness for warranted autonomy:
 
 > Think recursively. Know what is uncertain. Act only with proof.
 
-The preview demonstrates canonical state, calibrated uncertainty,
-impasse-driven recursion, an evidence ledger, independent verification,
-semantic capability leases, TET Resolve, governed memory, and execution
-receipts. It runs entirely in the browser with sample state and performs no
-external action.
+The harness provides editable canonical state, proportional warrant levels,
+calibrated uncertainty, narrow recursion, a weighted evidence ledger,
+independent verification, semantic capability leases, strict JSON import,
+browser-local persistence, an audit trail, and downloadable dry-run receipts.
+It performs no external action.
 
 The public reference contract is available at
 [`public/tet-noesis-contract.yaml`](public/tet-noesis-contract.yaml), with the
@@ -68,6 +69,7 @@ Then open `http://YOUR_MAC_IP:3000` from the device.
 
 ```bash
 pnpm format:check
+pnpm test
 pnpm lint
 pnpm build
 ```
@@ -76,7 +78,7 @@ pnpm build
 
 ```text
 src/app/          Next.js routes and visible product surfaces
-src/lib/          Deterministic domain logic
+src/lib/          Deterministic policy logic, schemas, and unit tests
 agents/           Specialist agent role instructions
 skills/           Repo-native task procedures
 docs/product/     Product intent and acceptance criteria
@@ -105,9 +107,9 @@ Hard gates:
 - never claim completion without running the relevant checks;
 - use a preview before production and keep rollback evidence.
 
-The model names and launch commands shown in the cockpit are adapter examples,
-not runtime requirements. Replace them with the local or hosted model profiles
-appropriate to your environment.
+The harness is model- and provider-neutral. Connect execution, verifier, policy,
+and shared persistence adapters only after defining their authorization, data,
+RBAC, observability, and rollback contracts.
 
 ## Contributing and security
 

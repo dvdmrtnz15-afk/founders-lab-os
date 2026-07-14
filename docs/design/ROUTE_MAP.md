@@ -1,9 +1,9 @@
 # Route Map
 
-| Route     | Purpose                                 | Owner          | Notes                                       |
-| --------- | --------------------------------------- | -------------- | ------------------------------------------- |
-| `/`       | FounderLab cockpit UI                   | Frontend Agent | Primary local build surface                 |
-| `/noesis` | TET Noesis warranted-autonomy workbench | Frontend Agent | Client-side reference preview; no execution |
+| Route     | Purpose                             | Owner          | Notes                                              |
+| --------- | ----------------------------------- | -------------- | -------------------------------------------------- |
+| `/`       | Focused governance command center   | Frontend Agent | Product entry, policy posture, and harness launch  |
+| `/noesis` | TET Noesis local governance harness | Frontend Agent | Browser-local dry-run workspace; no external tools |
 
 ## Rule
 

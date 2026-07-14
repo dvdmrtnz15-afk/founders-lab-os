@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #e7ece7;
+  --foreground: #101713;
 }
 
 @theme inline {
@@ -12,11 +12,8 @@
   --font-mono: var(--font-ibm-plex-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -28,6 +25,8 @@ body {
 }
 
 button,
+input,
+select,
 textarea {
   font: inherit;
 }
@@ -36,7 +35,78 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
+:focus-visible {
+  outline: 2px solid #15935b;
+  outline-offset: 3px;
+}
+
+.noesis-label {
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: #5c6c62;
+}
+
+.noesis-input {
+  width: 100%;
+  min-height: 2.75rem;
+  border: 1px solid #b9c5bd;
+  border-radius: 0;
+  background: #ffffff;
+  padding: 0.7rem 0.75rem;
+  color: #162019;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.noesis-input:hover {
+  border-color: #879a8e;
+}
+
+.noesis-input:focus {
+  border-color: #167448;
+  box-shadow: 0 0 0 3px rgb(22 116 72 / 12%);
+  outline: none;
+}
+
+.noesis-check {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid #bdc8c0;
+  background: #fff;
+  padding: 0.65rem 0.7rem;
+  font-size: 0.75rem;
+  color: #35433a;
+}
+
+.noesis-check input {
+  accent-color: #167448;
+}
+
 ::selection {
   background: #a7f3d0;
   color: #0f172a;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
