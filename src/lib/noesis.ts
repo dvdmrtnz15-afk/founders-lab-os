@@ -7,6 +7,11 @@ import {
   type NoesisWorkspace,
   type WarrantLevel,
 } from "./noesis-schema";
+import {
+  applyProbabilityFlowResolution,
+  createInitialProbabilityFlowProtocol,
+  verifyProbabilityFlowReplay,
+} from "./probability-flow";
 
 export type WarrantDecision = "allowed" | "verify" | "blocked";
 
@@ -26,6 +31,9 @@ export type WarrantBlocker = {
     | "lease_tools_missing"
     | "objective_missing"
     | "proof_coverage_low"
+    | "probability_flow_hold"
+    | "probability_flow_stale"
+    | "probability_flow_unresolved"
     | "uncertainty_high"
     | "workspace_invalid";
   message: string;
@@ -83,6 +91,10 @@ export const warrantPolicies: Record<WarrantLevel, WarrantPolicy> = {
 };
 
 const defaultTimestamp = "2026-07-13T00:00:00.000Z";
+const initialProbabilityFlow = applyProbabilityFlowResolution(
+  createInitialProbabilityFlowProtocol(defaultTimestamp),
+  defaultTimestamp,
+);
 
 export const initialNoesisWorkspace: NoesisWorkspace = {
   schemaVersion: NOESIS_SCHEMA_VERSION,
@@ -135,6 +147,7 @@ export const initialNoesisWorkspace: NoesisWorkspace = {
     approvalRequired: false,
     approvalGranted: false,
   },
+  probabilityFlow: initialProbabilityFlow,
   audit: [
     {
       id: "audit-workspace-created",
@@ -167,6 +180,10 @@ export function createInitialNoesisWorkspace(
       observedAt: now,
     })),
     lease: { ...initialNoesisWorkspace.lease },
+    probabilityFlow: applyProbabilityFlowResolution(
+      createInitialProbabilityFlowProtocol(now),
+      now,
+    ),
     audit: [
       {
         id: createNoesisId("audit"),
@@ -353,6 +370,7 @@ export function evaluateWarrant(
     Date.parse(workspace.lease.expiresAt) <= Date.parse(now),
   );
   const blockers: WarrantBlocker[] = [];
+  const latestProbabilityFlowReceipt = workspace.probabilityFlow.receipts[0];
 
   if (workspace.title.trim().length < 3) {
     blockers.push({
@@ -479,6 +497,37 @@ export function evaluateWarrant(
     });
   }
 
+  if (workspace.probabilityFlow.enabled && !latestProbabilityFlowReceipt) {
+    blockers.push({
+      code: "probability_flow_unresolved",
+      message: "Resolve the enabled probability-flow envelope before acting.",
+      hard: false,
+    });
+  }
+
+  if (workspace.probabilityFlow.enabled && latestProbabilityFlowReceipt) {
+    const replay = verifyProbabilityFlowReplay(
+      workspace.probabilityFlow,
+      latestProbabilityFlowReceipt,
+    );
+
+    if (!replay.ok) {
+      blockers.push({
+        code: "probability_flow_stale",
+        message:
+          "The probability-flow inputs changed after resolution; replay and re-authorize them.",
+        hard: true,
+      });
+    } else if (latestProbabilityFlowReceipt.decision === "hold") {
+      blockers.push({
+        code: "probability_flow_hold",
+        message:
+          "Probability flow authorizes no bounded effect under the current constraints.",
+        hard: true,
+      });
+    }
+  }
+
   if (!workspaceValidation.success) {
     blockers.push({
       code: "workspace_invalid",
@@ -533,6 +582,9 @@ export function issueDryRunReceipt(
     independentVerification: evaluation.independentVerification,
     authorityFingerprint: authorityFingerprint(workspace),
     lease: { ...workspace.lease, tools: [...workspace.lease.tools] },
+    probabilityFlowReceipt: workspace.probabilityFlow.enabled
+      ? workspace.probabilityFlow.receipts[0]
+      : undefined,
     residualRisk:
       options.residualRisk ??
       "External execution remains disabled; this receipt records a local dry run only.",

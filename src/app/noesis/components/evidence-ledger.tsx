@@ -138,7 +138,7 @@ export function EvidenceLedger({
               </label>
               <button
                 aria-label={`Remove ${item.claim}`}
-                className="px-2 py-2 font-mono text-[0.65rem] text-[#8b4b54] underline decoration-[#8b4b54]/30 underline-offset-4 transition hover:text-[#5e1722]"
+                className="min-h-11 px-2 py-2 font-mono text-[0.65rem] text-[#8b4b54] underline decoration-[#8b4b54]/30 underline-offset-4 transition hover:text-[#5e1722]"
                 onClick={() => onRemove(item.id)}
                 type="button"
               >
@@ -151,7 +151,7 @@ export function EvidenceLedger({
 
       <div className="border-t border-[#d7ddd8] bg-[#eef2ee] p-4 md:p-5">
         <button
-          className="border border-[#8ea196] bg-white px-3 py-2 text-sm font-semibold text-[#1c3126] transition hover:border-[#1f6e49] hover:text-[#0d6a42]"
+          className="min-h-11 border border-[#8ea196] bg-white px-3 py-2 text-sm font-semibold text-[#1c3126] transition hover:border-[#1f6e49] hover:text-[#0d6a42]"
           onClick={onAdd}
           type="button"
         >
