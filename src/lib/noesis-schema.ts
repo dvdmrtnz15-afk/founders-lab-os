@@ -1,4 +1,9 @@
 import { z } from "zod";
+import { createInitialProbabilityFlowProtocol } from "./probability-flow";
+import {
+  probabilityFlowProtocolSchema,
+  probabilityFlowReceiptSchema,
+} from "./probability-flow-schema";
 
 export const NOESIS_SCHEMA_VERSION = "1.0.0" as const;
 
@@ -36,6 +41,7 @@ export const auditEventSchema = z.strictObject({
     "evidence_removed",
     "lease_changed",
     "workspace_imported",
+    "probability_flow_resolved",
     "receipt_issued",
   ]),
   message: z.string().min(3).max(300),
@@ -57,26 +63,35 @@ export const receiptSchema = z.strictObject({
   verifiedEvidenceIds: z.array(z.string().min(3).max(80)).min(1),
   independentVerification: z.boolean(),
   lease: capabilityLeaseSchema,
+  probabilityFlowReceipt: probabilityFlowReceiptSchema.optional(),
   residualRisk: z.string().min(3).max(400),
 });
 
-export const noesisWorkspaceSchema = z.strictObject({
-  schemaVersion: z.literal(NOESIS_SCHEMA_VERSION),
-  workspaceId: z.string().min(3).max(80),
-  title: z.string().min(3).max(120),
-  objective: z.string().min(3).max(600),
-  canonicalState: z.string().min(3).max(1200),
-  uncertainty: z.number().min(0).max(1),
-  warrantLevel: warrantLevelSchema,
-  blocker: z.string().min(3).max(500),
-  recursionOpen: z.boolean(),
-  recursionDepth: z.number().int().min(0).max(5),
-  evidence: z.array(evidenceItemSchema).max(40),
-  lease: capabilityLeaseSchema,
-  audit: z.array(auditEventSchema).max(200),
-  receipts: z.array(receiptSchema).max(25),
-  updatedAt: z.string().datetime(),
-});
+export const noesisWorkspaceSchema = z
+  .strictObject({
+    schemaVersion: z.literal(NOESIS_SCHEMA_VERSION),
+    workspaceId: z.string().min(3).max(80),
+    title: z.string().min(3).max(120),
+    objective: z.string().min(3).max(600),
+    canonicalState: z.string().min(3).max(1200),
+    uncertainty: z.number().min(0).max(1),
+    warrantLevel: warrantLevelSchema,
+    blocker: z.string().min(3).max(500),
+    recursionOpen: z.boolean(),
+    recursionDepth: z.number().int().min(0).max(5),
+    evidence: z.array(evidenceItemSchema).max(40),
+    lease: capabilityLeaseSchema,
+    probabilityFlow: probabilityFlowProtocolSchema.optional(),
+    audit: z.array(auditEventSchema).max(200),
+    receipts: z.array(receiptSchema).max(25),
+    updatedAt: z.string().datetime(),
+  })
+  .transform((workspace) => ({
+    ...workspace,
+    probabilityFlow:
+      workspace.probabilityFlow ??
+      createInitialProbabilityFlowProtocol(workspace.updatedAt),
+  }));
 
 export type EvidenceStatus = z.infer<typeof evidenceStatusSchema>;
 export type WarrantLevel = z.infer<typeof warrantLevelSchema>;

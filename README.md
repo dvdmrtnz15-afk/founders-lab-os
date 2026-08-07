@@ -35,10 +35,20 @@ independent verification, semantic capability leases, strict JSON import,
 browser-local persistence, an audit trail, and downloadable dry-run receipts.
 It performs no external action.
 
+The same workbench now carries Invariant Probability Flow protocol `0.1.0`:
+distributional action risk, protected-boundary flux, liability-gated identity
+promotion, witness-preserving reduction, observer-lag revocation, and
+two-principal autonomy are resolved before a bounded effect can enter the
+Noesis receipt. All current psychology-facing weights are explicitly
+unvalidated research scaffolding.
+
 The public reference contract is available at
 [`public/tet-noesis-contract.yaml`](public/tet-noesis-contract.yaml), with the
 product boundary documented in
 [`docs/product/TET_NOESIS.md`](docs/product/TET_NOESIS.md).
+The equations, falsification surface, theorem targets, patent-style nucleus,
+and phased Lyzt adoption path are in
+[`docs/product/INVARIANT_PROBABILITY_FLOW.md`](docs/product/INVARIANT_PROBABILITY_FLOW.md).
 
 ## Quick start
 

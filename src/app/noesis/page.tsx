@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { NoesisWorkbench } from "./noesis-workbench";
 
 export const metadata: Metadata = {
-  title: "Noesis Governance Harness",
+  title: "Noesis Probability-Flow Governance Harness",
   description:
-    "A local-first enterprise harness for proof-gated agent decisions, scoped capability leases, and portable execution receipts.",
+    "A local-first harness for probability-flow forecasts, protected-boundary gates, scoped capability leases, and replayable execution receipts.",
 };
 
 export default function NoesisPage() {

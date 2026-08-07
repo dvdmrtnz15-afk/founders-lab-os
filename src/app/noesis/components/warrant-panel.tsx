@@ -43,6 +43,7 @@ export function WarrantPanel({
   const decision = decisionCopy[evaluation.decision];
   const policy = warrantPolicies[workspace.warrantLevel];
   const latestReceipt = workspace.receipts[0];
+  const latestFlowReceipt = workspace.probabilityFlow.receipts[0];
   const hasInactiveLease = evaluation.blockers.some(
     (blocker) => blocker.code === "lease_inactive",
   );
@@ -66,6 +67,16 @@ export function WarrantPanel({
       "lease_tools_missing",
     ].includes(blocker.code),
   );
+  const flowReady =
+    !workspace.probabilityFlow.enabled ||
+    (Boolean(latestFlowReceipt) &&
+      !evaluation.blockers.some((blocker) =>
+        [
+          "probability_flow_hold",
+          "probability_flow_stale",
+          "probability_flow_unresolved",
+        ].includes(blocker.code),
+      ));
 
   return (
     <aside className="order-first lg:order-last" aria-label="Warrant decision">
@@ -116,6 +127,7 @@ export function WarrantPanel({
               {[
                 ["State", stateReady],
                 ["Proof", proofReady],
+                ["Flow", flowReady],
                 ["Lease", leaseReady],
                 ["Receipt", Boolean(latestReceipt)],
               ].map(([label, complete], index) => (
@@ -150,8 +162,8 @@ export function WarrantPanel({
               </div>
             ) : (
               <p className="mt-5 border-l border-emerald-300/50 pl-3 text-xs leading-5 text-white/58">
-                Current evidence, uncertainty, authority, and lease scope
-                satisfy the declared policy.
+                Current evidence, probability flow, uncertainty, authority, and
+                lease scope satisfy the declared policy.
               </p>
             )}
 
@@ -176,7 +188,7 @@ export function WarrantPanel({
                 </button>
               ) : null}
               <button
-                className="border border-white/12 px-4 py-2.5 text-sm text-white/62 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
+                className="min-h-11 border border-white/12 px-4 py-2.5 text-sm text-white/62 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-35"
                 disabled={workspace.recursionOpen}
                 onClick={onOpenRecursion}
                 type="button"
@@ -204,10 +216,12 @@ export function WarrantPanel({
             </p>
             <div className="mt-3 flex items-center justify-between gap-3">
               <span className="text-xs text-[#68736b]">
-                Lease revoked after dry run
+                {latestReceipt.probabilityFlowReceipt
+                  ? `${latestReceipt.probabilityFlowReceipt.authorizedEffectIds.length} bounded effect(s) · lease revoked`
+                  : "Lease revoked after dry run"}
               </span>
               <button
-                className="text-xs font-semibold text-[#0d6a42] underline decoration-[#0d6a42]/30 underline-offset-4"
+                className="min-h-11 px-2 text-xs font-semibold text-[#0d6a42] underline decoration-[#0d6a42]/30 underline-offset-4"
                 onClick={onDownloadReceipt}
                 type="button"
               >

@@ -7,18 +7,20 @@ import {
   serializeWorkspace,
   warrantPolicies,
 } from "./noesis";
+import { applyProbabilityFlowResolution } from "./probability-flow";
 
 const now = "2026-07-13T12:00:00.000Z";
 
 function allowedWorkspace() {
+  const initial = structuredClone(initialNoesisWorkspace);
   return {
-    ...initialNoesisWorkspace,
+    ...initial,
     uncertainty: 0.12,
-    evidence: initialNoesisWorkspace.evidence.map((item) => ({
+    evidence: initial.evidence.map((item) => ({
       ...item,
       status: "verified" as const,
     })),
-    lease: { ...initialNoesisWorkspace.lease, active: true },
+    lease: { ...initial.lease, active: true },
   };
 }
 
@@ -96,6 +98,36 @@ describe("evaluateWarrant", () => {
     );
   });
 
+  it("blocks a stale probability-flow receipt after input drift", () => {
+    const workspace = allowedWorkspace();
+    workspace.probabilityFlow.actions[0].tailRisk = 0.75;
+
+    const result = evaluateWarrant(workspace, now);
+
+    expect(result.decision).toBe("blocked");
+    expect(result.blockers.map((blocker) => blocker.code)).toContain(
+      "probability_flow_stale",
+    );
+  });
+
+  it("blocks when probability flow authorizes no bounded effect", () => {
+    const workspace = allowedWorkspace();
+    workspace.probabilityFlow.actions = workspace.probabilityFlow.actions.map(
+      (action) => ({ ...action, authorized: false }),
+    );
+    workspace.probabilityFlow = applyProbabilityFlowResolution(
+      workspace.probabilityFlow,
+      now,
+    );
+
+    const result = evaluateWarrant(workspace, now);
+
+    expect(result.decision).toBe("blocked");
+    expect(result.blockers.map((blocker) => blocker.code)).toContain(
+      "probability_flow_hold",
+    );
+  });
+
   it("requires explicit human approval at high risk", () => {
     const workspace = {
       ...allowedWorkspace(),
@@ -143,6 +175,21 @@ describe("workspace contracts", () => {
     }
   });
 
+  it("normalizes an older workspace that has no probability-flow field", () => {
+    const legacy = structuredClone(initialNoesisWorkspace) as Partial<
+      typeof initialNoesisWorkspace
+    >;
+    delete legacy.probabilityFlow;
+
+    const result = deserializeWorkspace(JSON.stringify(legacy));
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.probabilityFlow.schemaVersion).toBe("0.1.0");
+      expect(result.data.probabilityFlow.reductions).toHaveLength(2);
+    }
+  });
+
   it("issues a dry-run receipt and revokes the lease", () => {
     const workspace = issueDryRunReceipt(allowedWorkspace(), {
       now,
@@ -153,6 +200,9 @@ describe("workspace contracts", () => {
     expect(workspace.receipts[0]?.verifiedEvidenceIds).toHaveLength(3);
     expect(workspace.lease.active).toBe(false);
     expect(workspace.audit[0]?.kind).toBe("receipt_issued");
+    expect(workspace.receipts[0]?.probabilityFlowReceipt?.decision).toBe(
+      "allow_partial",
+    );
   });
 
   it("refuses to issue a receipt without an allowed warrant", () => {

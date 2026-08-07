@@ -37,6 +37,84 @@ execution:
   production_requires_human_approval: true
   lease_revoked_after_receipt: true
 
+probability_flow:
+  schema_version: "0.1.0"
+  status: "operational_local_research_harness"
+  domains:
+    - identity
+    - affect
+    - liability
+    - memory
+    - relationship
+  forecast_input: "calibrated_summary_not_estimated_by_harness"
+  protected_boundary_flux_required: true
+  first_passage_exposure_required: true
+  tail_risk_required: true
+  identity_drift_required: true
+  reversibility_required: true
+  dependency_closed_effects: true
+  partial_authorization: true
+  referential_integrity:
+    fail_closed: true
+    duplicate_references_rejected: true
+    observer_dependency_node_namespace_shared: true
+    dangling_dependencies_rejected: true
+    dependency_node_cycles_rejected: true
+    action_cycles_explicitly_reported: true
+    relationship_effects_name_both_principals: true
+  identity_promotion:
+    transient_affect_may_promote: false
+    explicit_authority_required: true
+    contradictions_must_be_resolved: true
+    trust_liabilities_must_be_resolved: true
+  witness_reduction:
+    dissent_required: true
+    negative_evidence_required: true
+    rights_coordinates_required: true
+    reconstruction_error_bound_required: true
+    source_systems:
+      personality_interaction_144:
+        semantic_equivalent_to_identity_bloom: false
+      identity_bloom_12x12:
+        semantic_equivalent_to_personality_interaction: false
+    validation_status: "research_scaffolding"
+  observer_lag:
+    increases_uncertainty: true
+    transitive_revocation: true
+    invalidates:
+      - evidence
+      - plans
+      - certificates
+      - leases
+      - effects
+  care_flow:
+    distinct_principals_required: 2
+    consent_required: true
+    right_to_exit_required: true
+    attachment_is_optimization_reward: false
+    historical_facts_mutable: false
+    interpretations_may_version: true
+  receipt:
+    complete_lineage_required: true
+    local_replay_digest: "fnv1a_64_not_a_signature"
+    proof_bundle_version: "0.1.0"
+    canonicalization: "ipf-json-sorted-v1"
+    receipt_history_in_canonical_input: false
+    signed_runtime_adoption_target: "lyzt_governance_microkernel"
+    lyzt_wire_owner: "ip/governance-microkernel/transition-payload.ts"
+    lyzt_verifier_owner: "server/governance/probability-flow"
+    lyzt_public_import_surface: "server/governance/kernel-api"
+    lyzt_v3_binding: "sha256_hash_envelope_not_signature"
+    lyzt_ed25519_binding:
+      signer: "existing_governance_signer_only"
+      signed_field_projection_required: true
+      derive_after_probability_flow_attachment: true
+      leaf_only_extension_is_signed_proof: false
+      verifier_recomputes_projection: true
+    forbidden_namespace_conflation:
+      - "ip/governance-microkernel/tet.ts"
+      - "ip/governance-microkernel/tet-bridge.ts"
+
 warrant_policies:
   low:
     minimum_proof_coverage: 0.60

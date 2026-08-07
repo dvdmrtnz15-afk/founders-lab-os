@@ -47,7 +47,8 @@ export function WorkbenchHeader({
       <div className="mx-auto flex min-h-14 max-w-[1480px] items-center justify-between gap-3 px-4 py-2 md:px-6">
         <div className="flex min-w-0 items-center gap-3">
           <Link
-            className="grid h-8 w-8 shrink-0 place-items-center bg-[#a9f1c6] font-mono text-[0.68rem] font-bold text-[#07100c] transition hover:bg-white"
+            aria-label="FounderLab OS home"
+            className="grid h-11 w-11 shrink-0 place-items-center bg-[#a9f1c6] font-mono text-[0.68rem] font-bold text-[#07100c] transition hover:bg-white"
             href="/"
           >
             FL
@@ -72,6 +73,7 @@ export function WorkbenchHeader({
         <div className="flex items-center gap-1.5">
           <input
             accept="application/json,.json"
+            aria-hidden="true"
             aria-label="Choose a Noesis workspace JSON file"
             className="sr-only"
             onChange={handleImport}
@@ -80,21 +82,21 @@ export function WorkbenchHeader({
             type="file"
           />
           <button
-            className="border border-white/12 px-2.5 py-2 font-mono text-[0.62rem] text-white/64 transition hover:border-white/30 hover:text-white sm:px-3 sm:text-[0.65rem]"
+            className="min-h-11 border border-white/12 px-2.5 py-2 font-mono text-[0.62rem] text-white/64 transition hover:border-white/30 hover:text-white sm:px-3 sm:text-[0.65rem]"
             onClick={() => inputRef.current?.click()}
             type="button"
           >
             Import
           </button>
           <button
-            className="border border-white/12 px-2.5 py-2 font-mono text-[0.62rem] text-white/64 transition hover:border-white/30 hover:text-white sm:px-3 sm:text-[0.65rem]"
+            className="min-h-11 border border-white/12 px-2.5 py-2 font-mono text-[0.62rem] text-white/64 transition hover:border-white/30 hover:text-white sm:px-3 sm:text-[0.65rem]"
             onClick={onExport}
             type="button"
           >
             Export
           </button>
           <button
-            className={`px-2.5 py-2 font-mono text-[0.62rem] transition sm:px-3 sm:text-[0.65rem] ${resetArmed ? "bg-rose-300 text-[#24090d]" : "bg-white/8 text-white/58 hover:bg-white/14 hover:text-white"}`}
+            className={`min-h-11 px-2.5 py-2 font-mono text-[0.62rem] transition sm:px-3 sm:text-[0.65rem] ${resetArmed ? "bg-rose-300 text-[#24090d]" : "bg-white/8 text-white/58 hover:bg-white/14 hover:text-white"}`}
             onBlur={() => setResetArmed(false)}
             onClick={handleReset}
             type="button"
