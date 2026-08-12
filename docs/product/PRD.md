@@ -25,16 +25,18 @@ files, hidden backend features, broken UI paths, weak tests, and security drift.
 - Specialist agent instructions.
 - Skill-based task procedures.
 - Product, architecture, design, data, API, security, testing, and ops docs.
-- A visible TET Noesis reference workbench for proof-gated agent decisions.
+- An operational TET Noesis local harness for authoring, validating, persisting,
+  auditing, importing, exporting, and receipting proof-gated agent decisions.
 
 ## Non-Goals
 
 - Replacing human review for high-risk changes.
 - Reading secrets or production data.
 - Deploying directly to production.
-- Building a complete enterprise SDLC platform before product validation.
-- Presenting a client-side reference workbench as a persistent autonomous
-  runtime.
+- Building a shared enterprise control plane before tenancy, RBAC, policy,
+  adapter, and data contracts are approved.
+- Presenting a browser-local governance harness as a persistent autonomous
+  execution runtime.
 
 ## Acceptance Criteria
 
@@ -43,3 +45,7 @@ files, hidden backend features, broken UI paths, weak tests, and security drift.
 - Task procedures exist in `/skills`.
 - Core software-factory documents exist under `/docs`.
 - PRs include risk, surfacing, tests, rollback, and receipt evidence.
+- Operators can complete a governed Noesis dry run without a model provider or
+  backend.
+- Invalid imported workspace data is rejected before it becomes canonical.
+- Consequential warrant levels require independent proof and explicit approval.

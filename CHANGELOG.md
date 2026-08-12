@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Replaced the static command center and Noesis preview with a responsive,
+  operational local harness: editable canonical state and leases, proportional
+  warrant policies, strict JSON import/export, browser-local persistence, audit
+  history, downloadable dry-run receipts, automatic lease revocation, Zod 4
+  contracts, Vitest coverage, and CI test enforcement.
 - Made the project public-ready with a generalized README, package metadata,
   local-tool ignore rules, and a pnpm/Next.js CI workflow.
 - Added the TET Noesis public reference workbench, deterministic warrant

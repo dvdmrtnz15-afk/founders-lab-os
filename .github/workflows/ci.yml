@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Format, lint, and build
+    name: Test, format, lint, and build
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -36,6 +36,9 @@ jobs:
 
       - name: Check formatting
         run: pnpm format:check
+
+      - name: Test policy and contracts
+        run: pnpm test
 
       - name: Lint
         run: pnpm lint

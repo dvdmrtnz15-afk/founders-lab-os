@@ -15,9 +15,15 @@
 - Mobile layout is checked for UI changes.
 - Reference or simulated capabilities are labeled honestly and cannot imply
   production execution.
+- The command center has no inert controls or fake operational states.
+- The Noesis harness supports editable state, weighted evidence, proportional
+  policy, scoped leases, local persistence, validated import/export, audit, and
+  downloadable dry-run receipts.
+- Desktop and 390px mobile layouts expose the same core actions without
+  horizontal overflow.
 
 ## Release Work
 
-- Format, lint, and build are run or a reason is documented.
+- Unit tests, format, lint, and build are run or a reason is documented.
 - Security-sensitive changes get elevated review.
 - Vercel preview is used before production.

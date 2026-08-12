@@ -1,159 +1,450 @@
-export type EvidenceStatus = "verified" | "pending" | "failed";
-
-export type EvidenceItem = {
-  id: string;
-  label: string;
-  source: string;
-  status: EvidenceStatus;
-  weight: number;
-  independent: boolean;
-};
-
-export type CapabilityLease = {
-  scope: string;
-  tools: string[];
-  active: boolean;
-  budget: string;
-};
-
-export type NoesisSnapshot = {
-  objective: string;
-  canonicalState: string;
-  uncertainty: number;
-  recursionOpen: boolean;
-  recursionDepth: number;
-  blocker: string;
-  evidence: EvidenceItem[];
-  lease: CapabilityLease;
-};
+import {
+  NOESIS_SCHEMA_VERSION,
+  parseNoesisWorkspace,
+  type AuditEvent,
+  type EvidenceItem,
+  type NoesisReceipt,
+  type NoesisWorkspace,
+  type WarrantLevel,
+} from "./noesis-schema";
 
 export type WarrantDecision = "allowed" | "verify" | "blocked";
+
+export type WarrantBlocker = {
+  code:
+    | "approval_missing"
+    | "workspace_title_missing"
+    | "evidence_failed"
+    | "evidence_missing"
+    | "independent_verification_missing"
+    | "canonical_state_missing"
+    | "lease_expired"
+    | "lease_budget_missing"
+    | "lease_inactive"
+    | "lease_scope_missing"
+    | "lease_tools_missing"
+    | "objective_missing"
+    | "proof_coverage_low"
+    | "uncertainty_high"
+    | "workspace_invalid";
+  message: string;
+  hard: boolean;
+};
 
 export type WarrantEvaluation = {
   decision: WarrantDecision;
   coverage: number;
-  blockers: string[];
+  blockers: WarrantBlocker[];
   independentVerification: boolean;
+  verifiedCount: number;
+  evidenceCount: number;
 };
 
-export const initialNoesisSnapshot: NoesisSnapshot = {
+export type WarrantPolicy = {
+  label: string;
+  minimumCoverage: number;
+  maximumUncertainty: number;
+  requiresIndependentVerification: boolean;
+  requiresHumanApproval: boolean;
+};
+
+export const NOESIS_STORAGE_KEY = "founderlab.noesis.workspace.v1";
+
+export const warrantPolicies: Record<WarrantLevel, WarrantPolicy> = {
+  low: {
+    label: "Low / reversible",
+    minimumCoverage: 0.6,
+    maximumUncertainty: 0.4,
+    requiresIndependentVerification: false,
+    requiresHumanApproval: false,
+  },
+  medium: {
+    label: "Medium / controlled",
+    minimumCoverage: 0.8,
+    maximumUncertainty: 0.25,
+    requiresIndependentVerification: true,
+    requiresHumanApproval: false,
+  },
+  high: {
+    label: "High / consequential",
+    minimumCoverage: 0.9,
+    maximumUncertainty: 0.15,
+    requiresIndependentVerification: true,
+    requiresHumanApproval: true,
+  },
+  critical: {
+    label: "Critical / protected",
+    minimumCoverage: 1,
+    maximumUncertainty: 0.1,
+    requiresIndependentVerification: true,
+    requiresHumanApproval: true,
+  },
+};
+
+const defaultTimestamp = "2026-07-13T00:00:00.000Z";
+
+export const initialNoesisWorkspace: NoesisWorkspace = {
+  schemaVersion: NOESIS_SCHEMA_VERSION,
+  workspaceId: "workspace-public-preview",
+  title: "Public preview readiness",
   objective:
     "Prepare a reversible public preview after tests and independent verification pass.",
   canonicalState:
-    "Branch is local, production is gated, and no external action has been authorized.",
+    "The feature branch is local, production is gated, and no external execution has been authorized.",
   uncertainty: 0.31,
+  warrantLevel: "medium",
+  blocker: "Preview behavior has not been independently verified.",
   recursionOpen: false,
   recursionDepth: 0,
-  blocker: "Preview behavior has not been independently verified.",
   evidence: [
     {
-      id: "repo-state",
-      label: "Repository state is canonical",
-      source: "git status + branch baseline",
+      id: "evidence-repo-state",
+      claim: "Repository state is canonical",
+      source: "git status and branch baseline",
       status: "verified",
       weight: 30,
       independent: false,
+      observedAt: defaultTimestamp,
     },
     {
-      id: "policy-gate",
-      label: "Production remains approval-gated",
-      source: "release policy",
+      id: "evidence-policy-gate",
+      claim: "Production remains approval-gated",
+      source: "repository release policy",
       status: "verified",
       weight: 25,
       independent: true,
+      observedAt: defaultTimestamp,
     },
     {
-      id: "preview-proof",
-      label: "Preview matches the intended behavior",
+      id: "evidence-preview-proof",
+      claim: "Preview matches the intended behavior",
       source: "independent browser verifier",
       status: "pending",
       weight: 20,
       independent: true,
+      observedAt: defaultTimestamp,
     },
   ],
   lease: {
-    scope: "local preview verification",
+    scope: "Local preview verification",
     tools: ["read workspace", "run checks", "open localhost"],
     active: true,
-    budget: "1 blocker / 2 verifier passes",
+    budget: "One blocker and two verifier passes",
+    expiresAt: null,
+    approvalRequired: false,
+    approvalGranted: false,
   },
+  audit: [
+    {
+      id: "audit-workspace-created",
+      at: defaultTimestamp,
+      kind: "workspace_created",
+      message: "Default public workspace created.",
+    },
+  ],
+  receipts: [],
+  updatedAt: defaultTimestamp,
 };
 
-export function evaluateWarrant(snapshot: NoesisSnapshot): WarrantEvaluation {
-  const totalWeight = snapshot.evidence.reduce(
+export function createNoesisId(prefix: string): string {
+  const randomPart = globalThis.crypto?.randomUUID
+    ? globalThis.crypto.randomUUID().slice(0, 12)
+    : Math.random().toString(36).slice(2, 14);
+
+  return `${prefix}-${randomPart}`;
+}
+
+export function createInitialNoesisWorkspace(
+  now = new Date().toISOString(),
+): NoesisWorkspace {
+  return {
+    ...initialNoesisWorkspace,
+    workspaceId: createNoesisId("workspace"),
+    evidence: initialNoesisWorkspace.evidence.map((item) => ({
+      ...item,
+      id: createNoesisId("evidence"),
+      observedAt: now,
+    })),
+    lease: { ...initialNoesisWorkspace.lease },
+    audit: [
+      {
+        id: createNoesisId("audit"),
+        at: now,
+        kind: "workspace_created",
+        message: "New local workspace created.",
+      },
+    ],
+    receipts: [],
+    updatedAt: now,
+  };
+}
+
+export function appendAudit(
+  workspace: NoesisWorkspace,
+  event: Omit<AuditEvent, "id" | "at">,
+  now = new Date().toISOString(),
+): NoesisWorkspace {
+  return {
+    ...workspace,
+    audit: [
+      {
+        ...event,
+        id: createNoesisId("audit"),
+        at: now,
+      },
+      ...workspace.audit,
+    ].slice(0, 200),
+    updatedAt: now,
+  };
+}
+
+export function createEvidenceItem(
+  now = new Date().toISOString(),
+): EvidenceItem {
+  return {
+    id: createNoesisId("evidence"),
+    claim: "New proof claim",
+    source: "Describe the source or verifier",
+    status: "pending",
+    weight: 10,
+    independent: false,
+    observedAt: now,
+  };
+}
+
+export function evaluateWarrant(
+  workspace: NoesisWorkspace,
+  now = new Date().toISOString(),
+): WarrantEvaluation {
+  const workspaceValidation = parseNoesisWorkspace(workspace);
+  const policy = warrantPolicies[workspace.warrantLevel];
+  const totalWeight = workspace.evidence.reduce(
     (total, item) => total + item.weight,
     0,
   );
-  const verifiedWeight = snapshot.evidence
-    .filter((item) => item.status === "verified")
-    .reduce((total, item) => total + item.weight, 0);
+  const verifiedEvidence = workspace.evidence.filter(
+    (item) => item.status === "verified",
+  );
+  const verifiedWeight = verifiedEvidence.reduce(
+    (total, item) => total + item.weight,
+    0,
+  );
   const coverage = totalWeight === 0 ? 0 : verifiedWeight / totalWeight;
-  const hasFailedEvidence = snapshot.evidence.some(
+  const independentVerification = verifiedEvidence.some(
+    (item) => item.independent,
+  );
+  const failedEvidence = workspace.evidence.some(
     (item) => item.status === "failed",
   );
-  const independentVerification = snapshot.evidence.some(
-    (item) => item.independent && item.status === "verified",
+  const leaseExpired = Boolean(
+    workspace.lease.expiresAt &&
+    Date.parse(workspace.lease.expiresAt) <= Date.parse(now),
   );
-  const blockers: string[] = [];
+  const blockers: WarrantBlocker[] = [];
 
-  if (!snapshot.lease.active) blockers.push("Capability lease is inactive.");
-  if (hasFailedEvidence) blockers.push("A required proof failed verification.");
-  if (coverage < 0.8) blockers.push("Proof coverage is below 80%.");
-  if (!independentVerification)
-    blockers.push("Independent verification is missing.");
-  if (snapshot.uncertainty > 0.25)
-    blockers.push("Calibrated uncertainty is above 25%.");
-
-  if (
-    snapshot.lease.active &&
-    !hasFailedEvidence &&
-    coverage >= 0.8 &&
-    independentVerification &&
-    snapshot.uncertainty <= 0.25
-  ) {
-    return {
-      decision: "allowed",
-      coverage,
-      blockers: [],
-      independentVerification,
-    };
+  if (workspace.title.trim().length < 3) {
+    blockers.push({
+      code: "workspace_title_missing",
+      message: "Name this workspace before evaluation.",
+      hard: true,
+    });
   }
 
-  const decision: WarrantDecision =
-    snapshot.lease.active && !hasFailedEvidence && coverage >= 0.5
+  if (workspace.objective.trim().length < 3) {
+    blockers.push({
+      code: "objective_missing",
+      message: "Define a testable objective before evaluation.",
+      hard: true,
+    });
+  }
+
+  if (workspace.canonicalState.trim().length < 3) {
+    blockers.push({
+      code: "canonical_state_missing",
+      message: "Canonical current state is required.",
+      hard: true,
+    });
+  }
+
+  if (workspace.lease.scope.trim().length < 3) {
+    blockers.push({
+      code: "lease_scope_missing",
+      message: "Capability lease scope is required.",
+      hard: true,
+    });
+  }
+
+  if (workspace.lease.tools.length === 0) {
+    blockers.push({
+      code: "lease_tools_missing",
+      message: "Name at least one permitted tool.",
+      hard: true,
+    });
+  }
+
+  if (workspace.lease.budget.trim().length < 3) {
+    blockers.push({
+      code: "lease_budget_missing",
+      message: "Define a bounded lease budget.",
+      hard: true,
+    });
+  }
+
+  if (!workspace.lease.active) {
+    blockers.push({
+      code: "lease_inactive",
+      message: "Capability lease is inactive.",
+      hard: true,
+    });
+  }
+
+  if (leaseExpired) {
+    blockers.push({
+      code: "lease_expired",
+      message: "Capability lease has expired.",
+      hard: true,
+    });
+  }
+
+  if (
+    policy.requiresHumanApproval &&
+    (!workspace.lease.approvalRequired || !workspace.lease.approvalGranted)
+  ) {
+    blockers.push({
+      code: "approval_missing",
+      message: "Human approval is required for this warrant level.",
+      hard: true,
+    });
+  }
+
+  if (failedEvidence) {
+    blockers.push({
+      code: "evidence_failed",
+      message: "At least one proof item failed verification.",
+      hard: true,
+    });
+  }
+
+  if (workspace.evidence.length === 0) {
+    blockers.push({
+      code: "evidence_missing",
+      message: "At least one proof item is required.",
+      hard: false,
+    });
+  }
+
+  if (coverage < policy.minimumCoverage) {
+    blockers.push({
+      code: "proof_coverage_low",
+      message: `Proof coverage must reach ${formatPercent(policy.minimumCoverage)}.`,
+      hard: false,
+    });
+  }
+
+  if (policy.requiresIndependentVerification && !independentVerification) {
+    blockers.push({
+      code: "independent_verification_missing",
+      message: "Independent verified evidence is required.",
+      hard: false,
+    });
+  }
+
+  if (workspace.uncertainty > policy.maximumUncertainty) {
+    blockers.push({
+      code: "uncertainty_high",
+      message: `Uncertainty must be ${formatPercent(policy.maximumUncertainty)} or lower.`,
+      hard: false,
+    });
+  }
+
+  if (!workspaceValidation.success) {
+    blockers.push({
+      code: "workspace_invalid",
+      message: "Complete every required workspace field before evaluation.",
+      hard: true,
+    });
+  }
+
+  const decision: WarrantDecision = blockers.some((blocker) => blocker.hard)
+    ? "blocked"
+    : blockers.length > 0
       ? "verify"
-      : "blocked";
+      : "allowed";
 
-  return { decision, coverage, blockers, independentVerification };
-}
-
-export function openBlockingRecursion(
-  snapshot: NoesisSnapshot,
-): NoesisSnapshot {
   return {
-    ...snapshot,
-    recursionOpen: true,
-    recursionDepth: 1,
-    canonicalState:
-      "Only the preview-verification subproblem is open; the parent objective is frozen.",
-    uncertainty: Math.min(snapshot.uncertainty, 0.25),
+    decision,
+    coverage,
+    blockers,
+    independentVerification,
+    verifiedCount: verifiedEvidence.length,
+    evidenceCount: workspace.evidence.length,
   };
 }
 
-export function verifyBlockingEvidence(
-  snapshot: NoesisSnapshot,
-): NoesisSnapshot {
-  return {
-    ...snapshot,
-    recursionOpen: true,
-    recursionDepth: 1,
-    uncertainty: 0.17,
-    canonicalState:
-      "The preview verifier passed; production remains gated and external execution is still prohibited.",
-    evidence: snapshot.evidence.map((item) =>
-      item.id === "preview-proof"
-        ? { ...item, status: "verified" as const }
-        : item,
-    ),
+export function issueDryRunReceipt(
+  workspace: NoesisWorkspace,
+  options: { now?: string; receiptId?: string; residualRisk?: string } = {},
+): NoesisWorkspace {
+  const now = options.now ?? new Date().toISOString();
+  const evaluation = evaluateWarrant(workspace, now);
+
+  if (evaluation.decision !== "allowed") {
+    throw new Error("A receipt requires an allowed warrant decision.");
+  }
+
+  const receipt: NoesisReceipt = {
+    schemaVersion: NOESIS_SCHEMA_VERSION,
+    receiptId: options.receiptId ?? createNoesisId("receipt"),
+    workspaceId: workspace.workspaceId,
+    issuedAt: now,
+    decision: "allowed",
+    result: "dry_run_completed",
+    warrantLevel: workspace.warrantLevel,
+    objective: workspace.objective,
+    canonicalState: workspace.canonicalState,
+    canonicalStateRevision: workspace.updatedAt,
+    coverage: evaluation.coverage,
+    uncertainty: workspace.uncertainty,
+    verifiedEvidenceIds: workspace.evidence
+      .filter((item) => item.status === "verified")
+      .map((item) => item.id),
+    independentVerification: evaluation.independentVerification,
+    lease: { ...workspace.lease, tools: [...workspace.lease.tools] },
+    residualRisk:
+      options.residualRisk ??
+      "External execution remains disabled; this receipt records a local dry run only.",
   };
+
+  return appendAudit(
+    {
+      ...workspace,
+      lease: { ...workspace.lease, active: false },
+      receipts: [receipt, ...workspace.receipts].slice(0, 25),
+    },
+    {
+      kind: "receipt_issued",
+      message: `${receipt.receiptId} issued; the bounded lease was revoked.`,
+    },
+    now,
+  );
+}
+
+export function serializeWorkspace(workspace: NoesisWorkspace): string {
+  return `${JSON.stringify(workspace, null, 2)}\n`;
+}
+
+export function deserializeWorkspace(
+  serialized: string,
+):
+  | { success: true; data: NoesisWorkspace }
+  | { success: false; error: string } {
+  try {
+    return parseNoesisWorkspace(JSON.parse(serialized) as unknown);
+  } catch {
+    return { success: false, error: "Workspace file is not valid JSON." };
+  }
+}
+
+export function formatPercent(value: number): string {
+  return `${Math.round(value * 100)}%`;
 }

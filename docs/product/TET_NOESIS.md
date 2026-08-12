@@ -1,4 +1,4 @@
-# TET Noesis Public Reference Preview
+# TET Noesis Local Governance Harness
 
 ## Product intent
 
@@ -7,52 +7,75 @@ autonomy:
 
 > Think recursively. Know what is uncertain. Act only with proof.
 
-The first FounderLab OS implementation is intentionally a visible reference
-workbench, not a claim of a complete autonomous runtime. It makes the decision
-contract inspectable before persistence, tools, or production execution are
-introduced.
+The FounderLab OS implementation is an operational, local-first governance
+harness, not a claim of a complete autonomous runtime. It turns the decision
+contract into an editable, validated workspace while keeping external execution
+disabled.
 
-## What the preview implements
+## What the harness implements
 
-- A canonical objective and state boundary.
+- An editable canonical objective and state boundary.
 - Explicit calibrated uncertainty.
 - An evidence ledger with weights, provenance labels, and verifier independence.
 - Recursion that opens only the blocking subproblem.
-- A semantic capability lease with visible scope and budget.
+- A semantic capability lease with visible scope, tools, budget, expiry, human
+  approval, activation, and automatic revocation.
+- Proportional low, medium, high, and critical warrant policies.
 - A deterministic warrant decision: allow, verify, or block.
-- A simulated execution receipt after the warrant is satisfied.
+- Strict Zod validation for imported and stored workspace JSON.
+- Versioned browser-local persistence with explicit reset and export controls.
+- An append-only local audit trail and downloadable dry-run receipts.
+- Vitest policy and schema regression tests enforced in CI.
 - Public contract download at `/tet-noesis-contract.yaml`.
 
 ## Deliberate non-goals
 
 - No model inference or model provider integration.
 - No external tool execution.
-- No persistent memory, user data, database, auth, or RBAC.
+- No shared database, organization tenancy, auth, RBAC, telemetry, or server-side
+  persistence.
 - No production actions or live self-modification.
 - No claim that coordination or self-modeling constitutes consciousness.
 
-## Warrant rule
+## Warrant policies
 
-The reference evaluator permits the simulated receipt only when all of the
-following are true:
+The evaluator uses the highest declared consequence level:
+
+| Level    | Proof coverage | Maximum uncertainty | Independent proof | Human approval |
+| -------- | -------------- | ------------------- | ----------------- | -------------- |
+| Low      | 60%            | 40%                 | Optional          | No             |
+| Medium   | 80%            | 25%                 | Required          | No             |
+| High     | 90%            | 15%                 | Required          | Required       |
+| Critical | 100%           | 10%                 | Required          | Required       |
+
+The harness permits a dry-run receipt only when all applicable rules pass:
 
 1. The capability lease is active.
 2. No required evidence has failed.
-3. Weighted proof coverage is at least 80%.
-4. At least one independently sourced proof is verified.
-5. Calibrated uncertainty is at or below 25%.
+3. Weighted proof coverage reaches the selected policy threshold.
+4. Independently sourced proof and human approval are present when required.
+5. Calibrated uncertainty is at or below the selected policy threshold.
+6. The objective, canonical state, lease scope, and permitted tools are valid.
 
 Self-confidence and consensus do not satisfy any proof requirement.
+
+## Local data boundary
+
+The current workspace is stored under `founderlab.noesis.workspace.v1` in the
+browser's local storage. No background request, analytics call, cookie, or
+server write is performed. Users can export a versioned JSON workspace, import
+only a schema-valid workspace, download individual receipts, or clear the local
+workspace through a two-step reset.
 
 ## Upgrade path to a persistent kernel
 
 A production implementation should add capabilities in this order:
 
-1. Versioned canonical-state storage and immutable receipts.
+1. Shared, tenant-aware canonical-state storage and immutable receipt signing.
 2. Adapter contracts for model proposals and independent verifiers.
-3. Policy-enforced capability leases with expiry, scope, and revocation.
-4. Sandbox-only execution with protected tests and rollback.
-5. Governed memory with provenance, retention, contradiction tracking, and
+3. Server-enforced capability leases, policy decisions, and revocation.
+4. Sandbox-only execution with protected tests, observability, and rollback.
+5. Governed shared memory with provenance, retention, contradiction tracking, and
    deletion policy.
 6. Human approval, canary release, and monitored rollback before any production
    action.
