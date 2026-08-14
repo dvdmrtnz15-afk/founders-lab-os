@@ -28,8 +28,10 @@ jobs:
         with:
           node-version: 20
 
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Enable Corepack and activate pinned pnpm
+        run: |
+          corepack enable
+          corepack prepare "$(node -p "require('./package.json').packageManager")" --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
