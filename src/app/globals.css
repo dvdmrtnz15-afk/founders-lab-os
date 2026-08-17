@@ -3,6 +3,11 @@
 :root {
   --background: #e7ece7;
   --foreground: #101713;
+  --font-display:
+    "Space Grotesk", "Inter", "Avenir Next", "Segoe UI", sans-serif;
+  --font-ibm-plex-mono:
+    "IBM Plex Mono", "SFMono-Regular", "SF Mono", "Cascadia Code",
+    "Roboto Mono", monospace;
 }
 
 @theme inline {
