@@ -1,0 +1,26 @@
+{
+  "$schema": "https://truenorthapplications.com/schemas/sentinel-policy.v1.schema.json",
+  "schema": "truenorth.sentinel.policy.v1",
+  "profile": "founders-lab.governed-authoring.v1",
+  "max_file_bytes": 5242880,
+  "sensitive_globs": [
+    ".github/workflows/**",
+    "AGENTS.md",
+    "CODEOWNERS",
+    "public/**",
+    "src/**",
+    "agents/**",
+    "skills/**",
+    "docs/architecture/**",
+    "docs/security/**",
+    "next.config.ts",
+    "package.json",
+    "pnpm-lock.yaml"
+  ],
+  "required_evidence": [
+    "Governance contract impact",
+    "Independent verification",
+    "Tests",
+    "Rollback"
+  ]
+}
