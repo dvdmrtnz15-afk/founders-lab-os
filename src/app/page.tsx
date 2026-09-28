@@ -29,12 +29,20 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <Link
-            className="bg-[#102019] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1e4935] active:translate-y-px"
-            href="/noesis"
-          >
-            Open harness
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              className="px-3 py-2 text-sm font-semibold text-[#176c48]"
+              href="/exchange"
+            >
+              TrueNorth Exchange
+            </Link>
+            <Link
+              className="bg-[#102019] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1e4935] active:translate-y-px"
+              href="/noesis"
+            >
+              Open harness
+            </Link>
+          </div>
         </div>
       </header>
 

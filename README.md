@@ -40,6 +40,14 @@ The public reference contract is available at
 product boundary documented in
 [`docs/product/TET_NOESIS.md`](docs/product/TET_NOESIS.md).
 
+## TrueNorth Exchange
+
+`/exchange` is the asset research and transaction preparation workspace. It supports
+custom asset intake, comparison, financial scenarios, evidence records,
+revision-bound packet approvals, and password-encrypted local checkpoints and
+exports. External research, listings, legal and settlement providers are shown as
+unconnected. See [the product boundary](docs/product/TRUENORTH_EXCHANGE.md).
+
 ## Quick start
 
 Requirements:

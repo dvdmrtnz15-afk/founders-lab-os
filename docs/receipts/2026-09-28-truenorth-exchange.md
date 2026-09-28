@@ -1,0 +1,21 @@
+# Implementation receipt — TrueNorth Exchange
+
+- Task: build the asset transaction workspace on the user's existing GitHub and Vercel foundations.
+- Risk tier: CODE implementation; CLOUD review for encrypted storage and deployment.
+- Repo inspected: routes, Noesis model/schema/tests, governance, security, deployment policy, package/lockfile and GitHub CI.
+- Baseline: d10a82392d214f668b1d953de8135df5627b94c1.
+- Files created: Exchange route/workbench/scoped stylesheet; model, vault, focused tests; product contract, implementation plan, this receipt.
+- Files changed: home-page entry, README, route map and component registry.
+- Architecture: additive local transaction-preparation workspace reusing the existing Noesis evaluator and identifier/workspace helpers.
+- Frontend: `/exchange` opportunities, comparisons, deal room, evidence, financial scenarios, activity, encrypted vault, connection status.
+- Backend/API/database: none added. No shared server persistence or authentication claim.
+- Security: AES-GCM encrypted checkpoint/export, PBKDF2-derived key, strict bounded imports, unsafe URL rejection, no plaintext password persistence; approvals clear on import and material revision; one-use packet approval consumed after export. Concurrent-tab storage changes revoke overwrite eligibility; checkpoint comparison detects changed saved state before save. This is local integrity protection, not a multi-client transaction authority or an immutable audit log.
+- Dependencies: existing product dependencies and lockfile unchanged. Browser QA binary was installed in a separate scratch-only tool directory.
+- Tests added: 8 targeted calculation/scope/import/encryption tests, including wrong passwords and altered ciphertext.
+- Tests run: `corepack pnpm test` — 20 passed across 3 files; `corepack pnpm lint` — passed; `corepack pnpm format:check` — passed; `corepack pnpm build` — passed including TypeScript and static route generation; `git diff --check` — passed.
+- Browser proof: headless Chromium against the production build. Passed render, shortlist/comparison, invalid mandate handling, custom asset intake, evidence creation, approval/export/consumption, encrypted browser save, encrypted file export, lock confirmation, wrong-password rejection, reload/unlock, imported approval clearing, keyboard tabs, tablet accessible navigation, 390px mobile overflow check, and cross-tab checkpoint notification. No page errors observed. Desktop 1440px and mobile 390px screenshots visually inspected.
+- Reviewer verdict: independent read-only specialist ALLOW after fixes for pre-setter validation, lock confirmation, export destination, navigation accessible names, and vacancy guidance.
+- Known limitations: external AI research, property feeds, legal/signature services, payments/crypto, rentals and shared identity/storage remain unconnected and visibly labeled. Sample assets are illustrative. No financial or legal transaction was executed. Encryption does not protect an unlocked browser from malicious code; passphrase loss is unrecoverable. Multi-tab save comparison is best-effort, not an atomic shared-storage transaction.
+- Rollback: revert this feature commit; existing Noesis state keys, routes and policy engine remain intact.
+- Release authority: user's explicit build-on-GitHub-and-Vercel instruction. Preview-first policy; verify hosted result before any production merge.
+- Deployment result: recorded separately after the GitHub-triggered Vercel build is observed.
