@@ -11,3 +11,7 @@
 | Audit timeline       | `src/app/noesis/components/audit-timeline.tsx`   | Active |
 | Root layout          | `src/app/layout.tsx`                             | Active |
 | Global styles        | `src/app/globals.css`                            | Active |
+
+| Exchange workspace | `src/app/exchange/workbench.tsx` | Active |
+| Exchange model and Noesis adapter | `src/lib/exchange/model.ts` | Active |
+| Exchange encrypted vault | `src/lib/exchange/vault.ts` | Active |
