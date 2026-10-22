@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- Bound Noesis human approval to the content it was granted for. The evaluator
+  fingerprints the authorizing content and returns `approval_stale` (hard
+  block) when it changes; the workbench revokes stale approvals with an audit
+  event; imports arrive with the lease inactive and approval cleared; receipts
+  record the authorized content fingerprint. Approvals saved before this change
+  must be granted again.
+- Rewrote the README around the product thesis, shipped architecture, source
+  map, roadmap, and known limits.
 - Replaced the static command center and Noesis preview with a responsive,
   operational local harness: editable canonical state and leases, proportional
   warrant policies, strict JSON import/export, browser-local persistence, audit
