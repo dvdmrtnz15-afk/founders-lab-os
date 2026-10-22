@@ -24,6 +24,7 @@ disabled.
   workspace identity, tier, objective, canonical state, uncertainty, evidence
   ledger, and lease scope, tools, budget, and expiry. Any change revokes the
   approval in the workbench and blocks with `approval_stale` in the evaluator.
+  Evidence observation timestamps are excluded; freshness is not evaluated.
   Imported workspaces arrive with the lease inactive and approval cleared.
 - Proportional low, medium, high, and critical warrant policies.
 - A deterministic warrant decision: allow, verify, or block.

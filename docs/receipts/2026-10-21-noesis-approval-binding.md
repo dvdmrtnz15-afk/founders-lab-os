@@ -51,9 +51,14 @@
 - Known limitations: fingerprints are non-cryptographic; signed receipts remain
   roadmap step 1. A receipt does not consume the approval, so reactivating the
   lease on unchanged content can issue a second dry-run receipt.
-- Rollback: revert the approval-binding commit. The previous strict schema does
-  not know `approvalFingerprint`, so a browser workspace saved by this version
-  will fail to load after a revert; reset the workspace or remove that field
-  from the exported JSON.
+- Rollback: export and retain the workspace before reverting the approval-binding
+  commit. The previous strict schemas reject `lease.approvalFingerprint`,
+  `receipts[*].authorityFingerprint`, and
+  `receipts[*].lease.approvalFingerprint`. For a downgrade, remove all three
+  paths from a copy of the export and set its top-level `lease.active` and
+  `lease.approvalGranted` to `false` before importing it, or deliberately reset
+  the local workspace after preserving the export. Do not load the old app
+  over the only copy: its existing invalid-storage recovery may autosave a
+  default workspace over the rejected saved state.
 - Release authority: feature branch and pull request only. No merge or
   production deploy performed.

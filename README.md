@@ -236,9 +236,12 @@ These are stated plainly so that technical review starts from facts.
   server-authoritative system (roadmap step 3).
 - Receipts are structured records. They are not yet cryptographically signed
   (roadmap step 1).
-- Approval fingerprints detect any change to approved content. They use a fast
-  non-cryptographic hash and are not signatures, so they do not prove who
-  approved or resist deliberate tampering (roadmap step 1).
+- Approval fingerprints detect ordinary edits to protected content, subject to
+  hash collisions. Evidence observation timestamps are excluded; freshness is
+  not evaluated. These non-cryptographic hashes are not signatures, so they do
+  not prove who approved or resist deliberate tampering (roadmap step 1).
+- Reactivating an unchanged lease can issue another dry-run receipt without
+  fresh approval. Receipts do not confer single-use execution authority.
 - There is no authentication, tenancy, or telemetry yet.
 
 ## Quick start

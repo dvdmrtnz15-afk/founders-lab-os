@@ -117,8 +117,6 @@ export function NoesisWorkbench() {
                 ...current.lease,
                 approvalRequired:
                   warrantPolicies[warrantLevel].requiresHumanApproval,
-                approvalGranted: false,
-                approvalFingerprint: null,
               }
             : current.lease,
           updatedAt: now,

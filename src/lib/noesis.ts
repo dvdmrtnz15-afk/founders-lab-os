@@ -219,7 +219,9 @@ function fnv1a64(input: string): string {
  *
  * Presentation fields, audit history, receipts, and the lease's activation and
  * approval flags are excluded, so activating an approved lease does not void
- * the approval. This detects any change to approved content. It is not a
+ * the approval. Evidence observation timestamps are also excluded; the local
+ * evaluator does not assess freshness. This detects ordinary protected-content
+ * edits, subject to hash collisions. It is not a
  * cryptographic signature and does not protect against deliberate tampering.
  */
 export function authorityFingerprint(workspace: NoesisWorkspace): string {
