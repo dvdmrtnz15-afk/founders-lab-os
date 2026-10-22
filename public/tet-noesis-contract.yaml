@@ -36,6 +36,9 @@ execution:
   reversible_by_default: true
   production_requires_human_approval: true
   lease_revoked_after_receipt: true
+  approval_bound_to_content: true
+  approval_fingerprint: "fnv1a64_non_cryptographic"
+  imported_files_carry_authority: false
 
 warrant_policies:
   low:

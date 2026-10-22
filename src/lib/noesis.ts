@@ -13,6 +13,7 @@ export type WarrantDecision = "allowed" | "verify" | "blocked";
 export type WarrantBlocker = {
   code:
     | "approval_missing"
+    | "approval_stale"
     | "workspace_title_missing"
     | "evidence_failed"
     | "evidence_missing"
@@ -198,6 +199,117 @@ export function appendAudit(
   };
 }
 
+const FNV_OFFSET_64 = BigInt("0xcbf29ce484222325");
+const FNV_PRIME_64 = BigInt("0x100000001b3");
+const MASK_64 = BigInt("0xffffffffffffffff");
+
+function fnv1a64(input: string): string {
+  let hash = FNV_OFFSET_64;
+  for (const byte of new TextEncoder().encode(input)) {
+    hash ^= BigInt(byte);
+    hash = (hash * FNV_PRIME_64) & MASK_64;
+  }
+  return hash.toString(16).padStart(16, "0");
+}
+
+/**
+ * Deterministic fingerprint of everything a human approval vouches for: the
+ * workspace identity, warrant tier, objective, canonical state, uncertainty,
+ * evidence ledger, and lease scope, tools, budget, and expiry.
+ *
+ * Presentation fields, audit history, receipts, and the lease's activation and
+ * approval flags are excluded, so activating an approved lease does not void
+ * the approval. Evidence observation timestamps are also excluded; the local
+ * evaluator does not assess freshness. This detects ordinary protected-content
+ * edits, subject to hash collisions. It is not a
+ * cryptographic signature and does not protect against deliberate tampering.
+ */
+export function authorityFingerprint(workspace: NoesisWorkspace): string {
+  const evidence = [...workspace.evidence]
+    .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+    .map((item) => [
+      item.id,
+      item.claim,
+      item.source,
+      item.status,
+      item.weight,
+      item.independent,
+    ]);
+  const payload = JSON.stringify([
+    "noesis-authority-v1",
+    workspace.workspaceId,
+    workspace.warrantLevel,
+    workspace.objective,
+    workspace.canonicalState,
+    workspace.uncertainty,
+    evidence,
+    [
+      workspace.lease.scope,
+      workspace.lease.tools,
+      workspace.lease.budget,
+      workspace.lease.expiresAt,
+    ],
+  ]);
+
+  return `fnv1a64:${fnv1a64(payload)}`;
+}
+
+/** Records the approval flag together with the content it was granted for. */
+export function bindApproval(workspace: NoesisWorkspace): NoesisWorkspace {
+  return {
+    ...workspace,
+    lease: {
+      ...workspace.lease,
+      approvalFingerprint: workspace.lease.approvalGranted
+        ? authorityFingerprint(workspace)
+        : null,
+    },
+  };
+}
+
+/** Revokes a granted approval whose approved content has since changed. */
+export function reconcileApproval(
+  workspace: NoesisWorkspace,
+  now = new Date().toISOString(),
+): NoesisWorkspace {
+  const { lease } = workspace;
+
+  if (
+    !lease.approvalGranted ||
+    lease.approvalFingerprint === authorityFingerprint(workspace)
+  ) {
+    return workspace;
+  }
+
+  return appendAudit(
+    {
+      ...workspace,
+      lease: { ...lease, approvalGranted: false, approvalFingerprint: null },
+    },
+    {
+      kind: "lease_changed",
+      message:
+        "Human approval revoked because the approved content changed. Re-approve the current revision.",
+    },
+    now,
+  );
+}
+
+/** A portable file never grants authority: imports arrive inactive and unapproved. */
+export function stripImportedAuthority(
+  workspace: NoesisWorkspace,
+): NoesisWorkspace {
+  return {
+    ...workspace,
+    lease: {
+      ...workspace.lease,
+      active: false,
+      approvalGranted: false,
+      approvalFingerprint: null,
+    },
+  };
+}
+
 export function createEvidenceItem(
   now = new Date().toISOString(),
 ): EvidenceItem {
@@ -315,6 +427,16 @@ export function evaluateWarrant(
       message: "Human approval is required for this warrant level.",
       hard: true,
     });
+  } else if (
+    policy.requiresHumanApproval &&
+    workspace.lease.approvalFingerprint !== authorityFingerprint(workspace)
+  ) {
+    blockers.push({
+      code: "approval_stale",
+      message:
+        "Approval was granted for different content. Re-approve the current revision.",
+      hard: true,
+    });
   }
 
   if (failedEvidence) {
@@ -409,6 +531,7 @@ export function issueDryRunReceipt(
       .filter((item) => item.status === "verified")
       .map((item) => item.id),
     independentVerification: evaluation.independentVerification,
+    authorityFingerprint: authorityFingerprint(workspace),
     lease: { ...workspace.lease, tools: [...workspace.lease.tools] },
     residualRisk:
       options.residualRisk ??

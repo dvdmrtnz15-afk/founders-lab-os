@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
 import {
+  authorityFingerprint,
+  bindApproval,
   deserializeWorkspace,
   evaluateWarrant,
   initialNoesisWorkspace,
   issueDryRunReceipt,
+  reconcileApproval,
   serializeWorkspace,
+  stripImportedAuthority,
   warrantPolicies,
 } from "./noesis";
 
@@ -20,6 +24,20 @@ function allowedWorkspace() {
     })),
     lease: { ...initialNoesisWorkspace.lease, active: true },
   };
+}
+
+function approvedHighRiskWorkspace() {
+  const base = allowedWorkspace();
+  return bindApproval({
+    ...base,
+    uncertainty: warrantPolicies.high.maximumUncertainty,
+    warrantLevel: "high" as const,
+    lease: { ...base.lease, approvalRequired: true, approvalGranted: true },
+  });
+}
+
+function blockerCodes(workspace: Parameters<typeof evaluateWarrant>[0]) {
+  return evaluateWarrant(workspace, now).blockers.map((b) => b.code);
 }
 
 describe("evaluateWarrant", () => {
@@ -117,6 +135,99 @@ describe("evaluateWarrant", () => {
   });
 });
 
+describe("approval binding", () => {
+  it("allows a high-risk workspace with approval bound to its content", () => {
+    const workspace = approvedHighRiskWorkspace();
+
+    expect(workspace.lease.approvalFingerprint).toBe(
+      authorityFingerprint(workspace),
+    );
+    expect(evaluateWarrant(workspace, now).decision).toBe("allowed");
+  });
+
+  it("voids approval when any authorizing content changes", () => {
+    const approved = approvedHighRiskWorkspace();
+    const edits = [
+      { ...approved, objective: "A different objective entirely." },
+      { ...approved, canonicalState: "Production is now reachable." },
+      {
+        ...approved,
+        lease: {
+          ...approved.lease,
+          tools: [...approved.lease.tools, "deploy"],
+        },
+      },
+      {
+        ...approved,
+        evidence: approved.evidence.map((item, index) =>
+          index === 0 ? { ...item, source: "unreviewed claim" } : item,
+        ),
+      },
+    ];
+
+    for (const edited of edits) {
+      expect(evaluateWarrant(edited, now).decision).toBe("blocked");
+      expect(blockerCodes(edited)).toContain("approval_stale");
+    }
+  });
+
+  it("keeps approval through presentation edits and lease activation", () => {
+    const approved = approvedHighRiskWorkspace();
+    const reordered = {
+      ...approved,
+      title: "Renamed workspace",
+      audit: [],
+      evidence: [...approved.evidence].reverse(),
+      lease: { ...approved.lease, active: false },
+    };
+
+    expect(authorityFingerprint(reordered)).toBe(
+      authorityFingerprint(approved),
+    );
+    expect(blockerCodes(reordered)).not.toContain("approval_stale");
+  });
+
+  it("fails closed on approvals saved without a fingerprint", () => {
+    const legacy = approvedHighRiskWorkspace();
+    delete legacy.lease.approvalFingerprint;
+
+    expect(evaluateWarrant(legacy, now).decision).toBe("blocked");
+    expect(blockerCodes(legacy)).toContain("approval_stale");
+  });
+
+  it("revokes and audits a stale approval, and leaves a current one alone", () => {
+    const approved = approvedHighRiskWorkspace();
+    expect(reconcileApproval(approved, now)).toBe(approved);
+
+    const reconciled = reconcileApproval(
+      { ...approved, objective: "Changed after approval." },
+      now,
+    );
+
+    expect(reconciled.lease.approvalGranted).toBe(false);
+    expect(reconciled.lease.approvalFingerprint).toBeNull();
+    expect(reconciled.audit[0]?.kind).toBe("lease_changed");
+    expect(blockerCodes(reconciled)).toContain("approval_missing");
+  });
+
+  it("strips lease activation and approval from imported files", () => {
+    const parsed = deserializeWorkspace(
+      serializeWorkspace(approvedHighRiskWorkspace()),
+    );
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+
+    expect(evaluateWarrant(parsed.data, now).decision).toBe("allowed");
+
+    const imported = stripImportedAuthority(parsed.data);
+
+    expect(imported.lease.active).toBe(false);
+    expect(imported.lease.approvalGranted).toBe(false);
+    expect(imported.lease.approvalFingerprint).toBeNull();
+    expect(evaluateWarrant(imported, now).decision).toBe("blocked");
+  });
+});
+
 describe("workspace contracts", () => {
   it("round-trips a valid workspace", () => {
     const result = deserializeWorkspace(
@@ -153,6 +264,18 @@ describe("workspace contracts", () => {
     expect(workspace.receipts[0]?.verifiedEvidenceIds).toHaveLength(3);
     expect(workspace.lease.active).toBe(false);
     expect(workspace.audit[0]?.kind).toBe("receipt_issued");
+  });
+
+  it("records the authorized content fingerprint on the receipt", () => {
+    const approved = approvedHighRiskWorkspace();
+    const workspace = issueDryRunReceipt(approved, { now });
+
+    expect(workspace.receipts[0]?.authorityFingerprint).toBe(
+      authorityFingerprint(approved),
+    );
+    expect(deserializeWorkspace(serializeWorkspace(workspace)).success).toBe(
+      true,
+    );
   });
 
   it("refuses to issue a receipt without an allowed warrant", () => {

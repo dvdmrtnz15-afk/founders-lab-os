@@ -59,6 +59,7 @@ export function WarrantPanel({
   const leaseReady = !evaluation.blockers.some((blocker) =>
     [
       "approval_missing",
+      "approval_stale",
       "lease_budget_missing",
       "lease_expired",
       "lease_inactive",
