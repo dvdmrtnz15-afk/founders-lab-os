@@ -1,5 +1,10 @@
 # Independent review receipt — Noesis PR #10
 
+> Disposition update: the later council disposition in
+> `2026-10-22-noesis-pr10-council-disposition.md` supersedes this receipt's
+> human-review HOLD for this task. The findings and verification below remain
+> historical evidence for the reviewed source.
+
 - Task: independently review and repair approval integrity in
   [PR #10](https://github.com/dvdmrtnz15-afk/founders-lab-os/pull/10).
 - Risk tier: high for merge governance (authorization behavior), with effects
