@@ -20,6 +20,11 @@ disabled.
 - Recursion that opens only the blocking subproblem.
 - A semantic capability lease with visible scope, tools, budget, expiry, human
   approval, activation, and automatic revocation.
+- Human approval bound to a fingerprint of the content it vouches for: the
+  workspace identity, tier, objective, canonical state, uncertainty, evidence
+  ledger, and lease scope, tools, budget, and expiry. Any change revokes the
+  approval in the workbench and blocks with `approval_stale` in the evaluator.
+  Imported workspaces arrive with the lease inactive and approval cleared.
 - Proportional low, medium, high, and critical warrant policies.
 - A deterministic warrant decision: allow, verify, or block.
 - Strict Zod validation for imported and stored workspace JSON.
@@ -53,7 +58,8 @@ The harness permits a dry-run receipt only when all applicable rules pass:
 1. The capability lease is active.
 2. No required evidence has failed.
 3. Weighted proof coverage reaches the selected policy threshold.
-4. Independently sourced proof and human approval are present when required.
+4. Independently sourced proof and human approval are present when required,
+   and that approval was granted for the current content.
 5. Calibrated uncertainty is at or below the selected policy threshold.
 6. The objective, canonical state, lease scope, and permitted tools are valid.
 

@@ -4,13 +4,16 @@ import { useEffect, useState } from "react";
 import {
   NOESIS_STORAGE_KEY,
   appendAudit,
+  bindApproval,
   createEvidenceItem,
   createInitialNoesisWorkspace,
   deserializeWorkspace,
   evaluateWarrant,
   initialNoesisWorkspace,
   issueDryRunReceipt,
+  reconcileApproval,
   serializeWorkspace,
+  stripImportedAuthority,
   warrantPolicies,
 } from "@/lib/noesis";
 import {
@@ -64,7 +67,9 @@ export function NoesisWorkbench() {
       if (stored) {
         const result = deserializeWorkspace(stored);
         if (result.success) {
-          setWorkspace(result.data);
+          // Approvals saved before approval binding carry no fingerprint and
+          // are revoked here rather than shown as granted.
+          setWorkspace(reconcileApproval(result.data));
           setSavedRevision(result.data.updatedAt);
         } else {
           setNotice({
@@ -103,32 +108,42 @@ export function NoesisWorkbench() {
       const warrantLevel = patch.warrantLevel ?? current.warrantLevel;
       const policyChanged = patch.warrantLevel !== undefined;
 
-      return {
-        ...current,
-        ...patch,
-        lease: policyChanged
-          ? {
-              ...current.lease,
-              approvalRequired:
-                warrantPolicies[warrantLevel].requiresHumanApproval,
-              approvalGranted: false,
-            }
-          : current.lease,
-        updatedAt: now,
-      };
+      return reconcileApproval(
+        {
+          ...current,
+          ...patch,
+          lease: policyChanged
+            ? {
+                ...current.lease,
+                approvalRequired:
+                  warrantPolicies[warrantLevel].requiresHumanApproval,
+                approvalGranted: false,
+                approvalFingerprint: null,
+              }
+            : current.lease,
+          updatedAt: now,
+        },
+        now,
+      );
     });
   }
 
   function updateLease(patch: Partial<CapabilityLease>) {
     setWorkspace((current) => {
       const now = new Date().toISOString();
-      const updated = {
+      const merged = {
         ...current,
         lease: { ...current.lease, ...patch },
         updatedAt: now,
       };
+      const approvalChanged = patch.approvalGranted !== undefined;
+      // Granting approval binds it to the current content; any other lease
+      // edit revokes an approval whose content no longer matches.
+      const updated = approvalChanged
+        ? bindApproval(merged)
+        : reconcileApproval(merged, now);
 
-      if (patch.active === undefined && patch.approvalGranted === undefined) {
+      if (patch.active === undefined && !approvalChanged) {
         return updated;
       }
 
@@ -150,19 +165,22 @@ export function NoesisWorkbench() {
   function updateEvidence(id: string, patch: Partial<EvidenceItem>) {
     setWorkspace((current) => {
       const now = new Date().toISOString();
-      return {
-        ...current,
-        evidence: current.evidence.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                ...patch,
-                observedAt: patch.status ? now : item.observedAt,
-              }
-            : item,
-        ),
-        updatedAt: now,
-      };
+      return reconcileApproval(
+        {
+          ...current,
+          evidence: current.evidence.map((item) =>
+            item.id === id
+              ? {
+                  ...item,
+                  ...patch,
+                  observedAt: patch.status ? now : item.observedAt,
+                }
+              : item,
+          ),
+          updatedAt: now,
+        },
+        now,
+      );
     });
   }
 
@@ -170,24 +188,38 @@ export function NoesisWorkbench() {
     setWorkspace((current) => {
       const now = new Date().toISOString();
       const item = createEvidenceItem(now);
-      return appendAudit(
-        { ...current, evidence: [...current.evidence, item] },
-        { kind: "evidence_added", message: `${item.id} added to the ledger.` },
+      return reconcileApproval(
+        appendAudit(
+          { ...current, evidence: [...current.evidence, item] },
+          {
+            kind: "evidence_added",
+            message: `${item.id} added to the ledger.`,
+          },
+          now,
+        ),
         now,
       );
     });
   }
 
   function removeEvidence(id: string) {
-    setWorkspace((current) =>
-      appendAudit(
-        {
-          ...current,
-          evidence: current.evidence.filter((item) => item.id !== id),
-        },
-        { kind: "evidence_removed", message: `${id} removed from the ledger.` },
-      ),
-    );
+    setWorkspace((current) => {
+      const now = new Date().toISOString();
+      return reconcileApproval(
+        appendAudit(
+          {
+            ...current,
+            evidence: current.evidence.filter((item) => item.id !== id),
+          },
+          {
+            kind: "evidence_removed",
+            message: `${id} removed from the ledger.`,
+          },
+          now,
+        ),
+        now,
+      );
+    });
   }
 
   function openRecursion() {
@@ -239,15 +271,29 @@ export function NoesisWorkbench() {
       return;
     }
 
+    const now = new Date().toISOString();
     setWorkspace(
-      appendAudit(result.data, {
-        kind: "workspace_imported",
-        message: `Validated workspace imported from ${file.name}.`,
-      }),
+      appendAudit(
+        appendAudit(
+          stripImportedAuthority(result.data),
+          {
+            kind: "workspace_imported",
+            message: `Validated workspace imported from ${file.name}.`,
+          },
+          now,
+        ),
+        {
+          kind: "lease_changed",
+          message:
+            "Imported lease deactivated and approval cleared. Files carry no authority.",
+        },
+        now,
+      ),
     );
     setNotice({
       tone: "success",
-      message: "Workspace imported and validated.",
+      message:
+        "Workspace imported and validated. Reactivate the lease and re-approve before acting.",
     });
   }
 

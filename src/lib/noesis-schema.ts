@@ -24,6 +24,10 @@ export const capabilityLeaseSchema = z.strictObject({
   expiresAt: z.string().datetime().nullable(),
   approvalRequired: z.boolean(),
   approvalGranted: z.boolean(),
+  // Fingerprint of the authorizing content the approval was granted for.
+  // Optional so workspaces saved before approval binding still load; a
+  // missing fingerprint never satisfies a required approval.
+  approvalFingerprint: z.string().min(8).max(80).nullable().optional(),
 });
 
 export const auditEventSchema = z.strictObject({
@@ -56,6 +60,7 @@ export const receiptSchema = z.strictObject({
   uncertainty: z.number().min(0).max(1),
   verifiedEvidenceIds: z.array(z.string().min(3).max(80)).min(1),
   independentVerification: z.boolean(),
+  authorityFingerprint: z.string().min(8).max(80).optional(),
   lease: capabilityLeaseSchema,
   residualRisk: z.string().min(3).max(400),
 });
