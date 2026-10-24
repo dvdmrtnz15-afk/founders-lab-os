@@ -19,7 +19,7 @@ export function AuditTimeline({ workspace }: AuditTimelineProps) {
       <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-4 marker:content-none md:px-5">
         <span>
           <span className="block font-mono text-[0.62rem] uppercase tracking-[0.14em] text-[#52705f]">
-            03 / audit and receipts
+            04 / audit and receipts
           </span>
           <span className="mt-1 block text-lg font-semibold text-[#101713]">
             Local decision history

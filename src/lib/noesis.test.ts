@@ -11,18 +11,20 @@ import {
   stripImportedAuthority,
   warrantPolicies,
 } from "./noesis";
+import { applyProbabilityFlowResolution } from "./probability-flow";
 
 const now = "2026-07-13T12:00:00.000Z";
 
 function allowedWorkspace() {
+  const initial = structuredClone(initialNoesisWorkspace);
   return {
-    ...initialNoesisWorkspace,
+    ...initial,
     uncertainty: 0.12,
-    evidence: initialNoesisWorkspace.evidence.map((item) => ({
+    evidence: initial.evidence.map((item) => ({
       ...item,
       status: "verified" as const,
     })),
-    lease: { ...initialNoesisWorkspace.lease, active: true },
+    lease: { ...initial.lease, active: true },
   };
 }
 
@@ -111,6 +113,36 @@ describe("evaluateWarrant", () => {
     expect(result.decision).toBe("blocked");
     expect(result.blockers.map((blocker) => blocker.code)).toContain(
       "workspace_invalid",
+    );
+  });
+
+  it("blocks a stale probability-flow receipt after input drift", () => {
+    const workspace = allowedWorkspace();
+    workspace.probabilityFlow.actions[0].tailRisk = 0.75;
+
+    const result = evaluateWarrant(workspace, now);
+
+    expect(result.decision).toBe("blocked");
+    expect(result.blockers.map((blocker) => blocker.code)).toContain(
+      "probability_flow_stale",
+    );
+  });
+
+  it("blocks when probability flow authorizes no bounded effect", () => {
+    const workspace = allowedWorkspace();
+    workspace.probabilityFlow.actions = workspace.probabilityFlow.actions.map(
+      (action) => ({ ...action, authorized: false }),
+    );
+    workspace.probabilityFlow = applyProbabilityFlowResolution(
+      workspace.probabilityFlow,
+      now,
+    );
+
+    const result = evaluateWarrant(workspace, now);
+
+    expect(result.decision).toBe("blocked");
+    expect(result.blockers.map((blocker) => blocker.code)).toContain(
+      "probability_flow_hold",
     );
   });
 
@@ -228,6 +260,63 @@ describe("approval binding", () => {
   });
 });
 
+describe("approval binding covers probability flow", () => {
+  it("voids approval when probability flow is switched off", () => {
+    const approved = approvedHighRiskWorkspace();
+    const disabled = {
+      ...approved,
+      probabilityFlow: { ...approved.probabilityFlow, enabled: false },
+    };
+
+    expect(evaluateWarrant(disabled, now).decision).toBe("blocked");
+    expect(blockerCodes(disabled)).toContain("approval_stale");
+  });
+
+  it("voids approval when re-resolved inputs change the authorized effects", () => {
+    const approved = approvedHighRiskWorkspace();
+    const flow = structuredClone(approved.probabilityFlow);
+    flow.actions = flow.actions.map((action) => ({
+      ...action,
+      authorized: false,
+    }));
+    const reResolved = {
+      ...approved,
+      probabilityFlow: applyProbabilityFlowResolution(flow, now),
+    };
+
+    expect(blockerCodes(reResolved)).toContain("approval_stale");
+    expect(blockerCodes(reResolved)).not.toContain("probability_flow_stale");
+  });
+
+  it("keeps approval through an identical re-resolution", () => {
+    const approved = approvedHighRiskWorkspace();
+    const reResolved = {
+      ...approved,
+      probabilityFlow: applyProbabilityFlowResolution(
+        approved.probabilityFlow,
+        now,
+      ),
+    };
+
+    expect(reResolved.probabilityFlow.receipts[0]?.receiptId).not.toBe(
+      approved.probabilityFlow.receipts[0]?.receiptId,
+    );
+    expect(blockerCodes(reResolved)).not.toContain("approval_stale");
+  });
+
+  it("fails closed without throwing on an invalid probability-flow draft", () => {
+    const approved = approvedHighRiskWorkspace();
+    const draft = structuredClone(approved);
+    draft.probabilityFlow.actions[0].dependencyNodeIds = ["missing-node"];
+
+    expect(() => authorityFingerprint(draft)).not.toThrow();
+    expect(authorityFingerprint(draft)).not.toBe(
+      authorityFingerprint(approved),
+    );
+    expect(evaluateWarrant(draft, now).decision).toBe("blocked");
+  });
+});
+
 describe("workspace contracts", () => {
   it("round-trips a valid workspace", () => {
     const result = deserializeWorkspace(
@@ -254,6 +343,21 @@ describe("workspace contracts", () => {
     }
   });
 
+  it("normalizes an older workspace that has no probability-flow field", () => {
+    const legacy = structuredClone(initialNoesisWorkspace) as Partial<
+      typeof initialNoesisWorkspace
+    >;
+    delete legacy.probabilityFlow;
+
+    const result = deserializeWorkspace(JSON.stringify(legacy));
+
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.probabilityFlow.schemaVersion).toBe("0.1.0");
+      expect(result.data.probabilityFlow.reductions).toHaveLength(2);
+    }
+  });
+
   it("issues a dry-run receipt and revokes the lease", () => {
     const workspace = issueDryRunReceipt(allowedWorkspace(), {
       now,
@@ -264,6 +368,9 @@ describe("workspace contracts", () => {
     expect(workspace.receipts[0]?.verifiedEvidenceIds).toHaveLength(3);
     expect(workspace.lease.active).toBe(false);
     expect(workspace.audit[0]?.kind).toBe("receipt_issued");
+    expect(workspace.receipts[0]?.probabilityFlowReceipt?.decision).toBe(
+      "allow_partial",
+    );
   });
 
   it("records the authorized content fingerprint on the receipt", () => {

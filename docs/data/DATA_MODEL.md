@@ -11,10 +11,15 @@ The Noesis harness stores one strict, versioned JSON workspace under
 - evidence items with claim, source, status, weight, independence, and timestamp;
 - capability lease scope, tools, budget, expiry, approval, and active state;
 - bounded local audit events and historical dry-run receipts.
+- an optional-on-import, normalized Invariant Probability Flow envelope with
+  forecast summaries, observer dependencies, protected boundaries, distinct
+  reduction namespaces, two principals, immutable memory-fact digests,
+  candidate effects, and bounded replay receipts.
 
 Storage is local to the browser origin. Import is rejected unless the complete
-object passes `noesisWorkspaceSchema`. Reset deletes the local key. No background
-sync, analytics, backup, or remote retention exists.
+object passes `noesisWorkspaceSchema`. Older version-1 workspaces without the
+flow field are normalized with the labeled demo envelope. Reset deletes the
+local key. No background sync, analytics, backup, or remote retention exists.
 
 ## Future Data Rules
 

@@ -1,0 +1,1969 @@
+{
+  "format": "ipf-conformance",
+  "formatVersion": 1,
+  "protocolVersion": "0.1.0",
+  "canonicalization": "ipf-json-sorted-v1",
+  "evaluatedAt": "2026-07-13T12:00:00.000Z",
+  "summary": "Portable conformance vectors for Invariant Probability Flow. Every implementation that claims this protocol version must produce exactly these outcomes.",
+  "procedure": [
+    "For each vector, validate `input` against the protocol schema.",
+    "If `expect.valid` is false, the schema must reject the input. Do not resolve it. `expect.rule` names the violated rule for humans; error wording is not compared.",
+    "If `expect.valid` is true, the schema must accept the input.",
+    "SHA-256 of the canonical input (ipf-json-sorted-v1, receipts excluded) must equal `expect.canonicalInputSha256`.",
+    "Resolving the input at `evaluatedAt` must yield `expect.decision`, the same set of `authorizedEffectIds`, and the same blocked effects with the same set of blocker codes per effect."
+  ],
+  "provenance": "Inputs are the reference demo protocol plus one named mutation each, recorded in `derivation`. Expected outcomes were taken from the founders-lab-os reference implementation. This file is the specification: change it deliberately, never by regenerating it from an implementation.",
+  "vectors": [
+    {
+      "id": "accept-demo-baseline",
+      "description": "Reference care-repair demo. Authorizes only the dependency-closed repair message.",
+      "derivation": "createInitialProbabilityFlowProtocol(evaluatedAt), unmodified.",
+      "input": {
+        "schemaVersion": "0.1.0",
+        "enabled": true,
+        "scenarioId": "care-repair-demo",
+        "forecastAsOf": "2026-07-13T12:00:00.000Z",
+        "horizonHours": 720,
+        "baseUncertainty": 0.12,
+        "maximumActionRisk": 0.52,
+        "riskWeights": {
+          "tailRisk": 0.35,
+          "firstPassageExposure": 0.3,
+          "identityDrift": 0.25,
+          "irreversibility": 0.15,
+          "uncertainty": 0.2
+        },
+        "observers": [
+          {
+            "id": "observer-current-consent",
+            "label": "Current consent observation",
+            "observedAt": "2026-07-13T12:00:00.000Z",
+            "expiresAt": "2030-01-01T00:00:00.000Z",
+            "uncertaintyContribution": 0.18
+          }
+        ],
+        "dependencyNodes": [
+          {
+            "id": "evidence-current-consent",
+            "kind": "evidence",
+            "dependsOn": ["observer-current-consent"]
+          },
+          {
+            "id": "plan-repair-message",
+            "kind": "plan",
+            "dependsOn": ["evidence-current-consent"]
+          },
+          {
+            "id": "certificate-care-boundary",
+            "kind": "certificate",
+            "dependsOn": ["plan-repair-message"]
+          },
+          {
+            "id": "lease-repair-message",
+            "kind": "lease",
+            "dependsOn": ["certificate-care-boundary"]
+          }
+        ],
+        "boundaries": [
+          {
+            "id": "boundary-autonomy",
+            "label": "Consent and exit remain available",
+            "domain": "relationship",
+            "protectedRight": "Each principal retains agency and the right to exit.",
+            "outwardFlux": 0.02,
+            "maximumOutwardFlux": 0.08,
+            "crossingProbability": 0.03,
+            "maximumCrossingProbability": 0.08,
+            "authoritySatisfied": true
+          },
+          {
+            "id": "boundary-canonical-identity",
+            "label": "Canonical identity cannot be silently overwritten",
+            "domain": "identity",
+            "protectedRight": "Canonical identity changes require deliberation and authority.",
+            "outwardFlux": 0.42,
+            "maximumOutwardFlux": 0.1,
+            "crossingProbability": 0.48,
+            "maximumCrossingProbability": 0.1,
+            "authoritySatisfied": false
+          }
+        ],
+        "identityPromotion": {
+          "requested": true,
+          "source": "transient_affect",
+          "explicitAuthority": false,
+          "unresolvedContradictions": 1,
+          "unresolvedTrustLiabilities": 1
+        },
+        "reductions": [
+          {
+            "id": "reduction-personality-interaction",
+            "sourceSystem": "personality_interaction_144",
+            "sourceCardinality": 144,
+            "semanticRole": "Distributional personality interaction factors; not Identity Bloom nodes.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "truthfulness"],
+            "retainedRightsCoordinates": ["agency", "truthfulness"],
+            "reconstructionError": 0.04,
+            "maximumReconstructionError": 0.08
+          },
+          {
+            "id": "reduction-identity-bloom",
+            "sourceSystem": "identity_bloom_12x12",
+            "sourceCardinality": 144,
+            "semanticRole": "Identity Bloom 12 by 12 behavioral graph; not personality factors.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "exit"],
+            "retainedRightsCoordinates": ["agency", "exit"],
+            "reconstructionError": 0.05,
+            "maximumReconstructionError": 0.08
+          }
+        ],
+        "principals": [
+          {
+            "id": "principal-self",
+            "label": "Principal A",
+            "consent": true,
+            "rightToExit": true
+          },
+          {
+            "id": "principal-other",
+            "label": "Principal B",
+            "consent": true,
+            "rightToExit": true
+          }
+        ],
+        "careConstraints": {
+          "maximumHarm": 0.12,
+          "minimumBoundaryRespect": 0.85
+        },
+        "careFlow": [
+          {
+            "horizon": "immediate",
+            "care": 0.7,
+            "commitment": 0.55,
+            "repair": 0.8,
+            "harm": 0.06,
+            "boundaryRespect": 0.94
+          },
+          {
+            "horizon": "repair",
+            "care": 0.74,
+            "commitment": 0.62,
+            "repair": 0.82,
+            "harm": 0.05,
+            "boundaryRespect": 0.95
+          },
+          {
+            "horizon": "commitment",
+            "care": 0.72,
+            "commitment": 0.68,
+            "repair": 0.76,
+            "harm": 0.07,
+            "boundaryRespect": 0.93
+          }
+        ],
+        "memoryEvents": [
+          {
+            "id": "memory-repair-request",
+            "occurredAt": "2026-07-13T12:00:00.000Z",
+            "immutableFactDigest": "fact-sha256-demo-repair-request",
+            "interpretationRevision": 1,
+            "interpretation": "A repair request occurred; its meaning remains open to evidence-based revision."
+          }
+        ],
+        "actions": [
+          {
+            "id": "effect-draft-repair-message",
+            "label": "Draft a consent-preserving repair message",
+            "utility": 0.72,
+            "tailRisk": 0.08,
+            "firstPassageExposure": 0.05,
+            "identityDrift": 0.02,
+            "reversibility": 0.95,
+            "authorized": true,
+            "boundaryIds": ["boundary-autonomy"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": ["lease-repair-message"],
+            "reductionIds": ["reduction-personality-interaction"],
+            "principalIds": ["principal-self", "principal-other"],
+            "requiresIdentityPromotion": false
+          },
+          {
+            "id": "effect-rewrite-canonical-identity",
+            "label": "Rewrite canonical identity from the current affective state",
+            "utility": 0.96,
+            "tailRisk": 0.92,
+            "firstPassageExposure": 0.84,
+            "identityDrift": 0.95,
+            "reversibility": 0.08,
+            "authorized": false,
+            "boundaryIds": ["boundary-canonical-identity"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": [],
+            "reductionIds": ["reduction-identity-bloom"],
+            "principalIds": ["principal-self"],
+            "requiresIdentityPromotion": true
+          }
+        ],
+        "receipts": []
+      },
+      "expect": {
+        "valid": true,
+        "canonicalInputSha256": "ec3eba97e086e86291c9e98a8bad71834d04379fb9447196d44de770be6bb29b",
+        "decision": "allow_partial",
+        "authorizedEffectIds": ["effect-draft-repair-message"],
+        "blockedEffects": [
+          {
+            "effectId": "effect-rewrite-canonical-identity",
+            "blockerCodes": [
+              "action_not_authorized",
+              "identity_promotion_blocked",
+              "protected_boundary_crossed",
+              "risk_limit_exceeded"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "accept-key-order-independent",
+      "description": "Same protocol with every object's keys in reverse order. Canonical input and outcome must be identical to the baseline.",
+      "derivation": "Baseline with object keys reversed at every depth; array order preserved.",
+      "input": {
+        "receipts": [],
+        "actions": [
+          {
+            "requiresIdentityPromotion": false,
+            "principalIds": ["principal-self", "principal-other"],
+            "reductionIds": ["reduction-personality-interaction"],
+            "dependencyNodeIds": ["lease-repair-message"],
+            "dependsOnActions": [],
+            "boundaryIds": ["boundary-autonomy"],
+            "authorized": true,
+            "reversibility": 0.95,
+            "identityDrift": 0.02,
+            "firstPassageExposure": 0.05,
+            "tailRisk": 0.08,
+            "utility": 0.72,
+            "label": "Draft a consent-preserving repair message",
+            "id": "effect-draft-repair-message"
+          },
+          {
+            "requiresIdentityPromotion": true,
+            "principalIds": ["principal-self"],
+            "reductionIds": ["reduction-identity-bloom"],
+            "dependencyNodeIds": [],
+            "dependsOnActions": [],
+            "boundaryIds": ["boundary-canonical-identity"],
+            "authorized": false,
+            "reversibility": 0.08,
+            "identityDrift": 0.95,
+            "firstPassageExposure": 0.84,
+            "tailRisk": 0.92,
+            "utility": 0.96,
+            "label": "Rewrite canonical identity from the current affective state",
+            "id": "effect-rewrite-canonical-identity"
+          }
+        ],
+        "memoryEvents": [
+          {
+            "interpretation": "A repair request occurred; its meaning remains open to evidence-based revision.",
+            "interpretationRevision": 1,
+            "immutableFactDigest": "fact-sha256-demo-repair-request",
+            "occurredAt": "2026-07-13T12:00:00.000Z",
+            "id": "memory-repair-request"
+          }
+        ],
+        "careFlow": [
+          {
+            "boundaryRespect": 0.94,
+            "harm": 0.06,
+            "repair": 0.8,
+            "commitment": 0.55,
+            "care": 0.7,
+            "horizon": "immediate"
+          },
+          {
+            "boundaryRespect": 0.95,
+            "harm": 0.05,
+            "repair": 0.82,
+            "commitment": 0.62,
+            "care": 0.74,
+            "horizon": "repair"
+          },
+          {
+            "boundaryRespect": 0.93,
+            "harm": 0.07,
+            "repair": 0.76,
+            "commitment": 0.68,
+            "care": 0.72,
+            "horizon": "commitment"
+          }
+        ],
+        "careConstraints": {
+          "minimumBoundaryRespect": 0.85,
+          "maximumHarm": 0.12
+        },
+        "principals": [
+          {
+            "rightToExit": true,
+            "consent": true,
+            "label": "Principal A",
+            "id": "principal-self"
+          },
+          {
+            "rightToExit": true,
+            "consent": true,
+            "label": "Principal B",
+            "id": "principal-other"
+          }
+        ],
+        "reductions": [
+          {
+            "maximumReconstructionError": 0.08,
+            "reconstructionError": 0.04,
+            "retainedRightsCoordinates": ["agency", "truthfulness"],
+            "requiredRightsCoordinates": ["agency", "truthfulness"],
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "validationStatus": "research_scaffolding",
+            "semanticRole": "Distributional personality interaction factors; not Identity Bloom nodes.",
+            "sourceCardinality": 144,
+            "sourceSystem": "personality_interaction_144",
+            "id": "reduction-personality-interaction"
+          },
+          {
+            "maximumReconstructionError": 0.08,
+            "reconstructionError": 0.05,
+            "retainedRightsCoordinates": ["agency", "exit"],
+            "requiredRightsCoordinates": ["agency", "exit"],
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "validationStatus": "research_scaffolding",
+            "semanticRole": "Identity Bloom 12 by 12 behavioral graph; not personality factors.",
+            "sourceCardinality": 144,
+            "sourceSystem": "identity_bloom_12x12",
+            "id": "reduction-identity-bloom"
+          }
+        ],
+        "identityPromotion": {
+          "unresolvedTrustLiabilities": 1,
+          "unresolvedContradictions": 1,
+          "explicitAuthority": false,
+          "source": "transient_affect",
+          "requested": true
+        },
+        "boundaries": [
+          {
+            "authoritySatisfied": true,
+            "maximumCrossingProbability": 0.08,
+            "crossingProbability": 0.03,
+            "maximumOutwardFlux": 0.08,
+            "outwardFlux": 0.02,
+            "protectedRight": "Each principal retains agency and the right to exit.",
+            "domain": "relationship",
+            "label": "Consent and exit remain available",
+            "id": "boundary-autonomy"
+          },
+          {
+            "authoritySatisfied": false,
+            "maximumCrossingProbability": 0.1,
+            "crossingProbability": 0.48,
+            "maximumOutwardFlux": 0.1,
+            "outwardFlux": 0.42,
+            "protectedRight": "Canonical identity changes require deliberation and authority.",
+            "domain": "identity",
+            "label": "Canonical identity cannot be silently overwritten",
+            "id": "boundary-canonical-identity"
+          }
+        ],
+        "dependencyNodes": [
+          {
+            "dependsOn": ["observer-current-consent"],
+            "kind": "evidence",
+            "id": "evidence-current-consent"
+          },
+          {
+            "dependsOn": ["evidence-current-consent"],
+            "kind": "plan",
+            "id": "plan-repair-message"
+          },
+          {
+            "dependsOn": ["plan-repair-message"],
+            "kind": "certificate",
+            "id": "certificate-care-boundary"
+          },
+          {
+            "dependsOn": ["certificate-care-boundary"],
+            "kind": "lease",
+            "id": "lease-repair-message"
+          }
+        ],
+        "observers": [
+          {
+            "uncertaintyContribution": 0.18,
+            "expiresAt": "2030-01-01T00:00:00.000Z",
+            "observedAt": "2026-07-13T12:00:00.000Z",
+            "label": "Current consent observation",
+            "id": "observer-current-consent"
+          }
+        ],
+        "riskWeights": {
+          "uncertainty": 0.2,
+          "irreversibility": 0.15,
+          "identityDrift": 0.25,
+          "firstPassageExposure": 0.3,
+          "tailRisk": 0.35
+        },
+        "maximumActionRisk": 0.52,
+        "baseUncertainty": 0.12,
+        "horizonHours": 720,
+        "forecastAsOf": "2026-07-13T12:00:00.000Z",
+        "scenarioId": "care-repair-demo",
+        "enabled": true,
+        "schemaVersion": "0.1.0"
+      },
+      "expect": {
+        "valid": true,
+        "canonicalInputSha256": "ec3eba97e086e86291c9e98a8bad71834d04379fb9447196d44de770be6bb29b",
+        "decision": "allow_partial",
+        "authorizedEffectIds": ["effect-draft-repair-message"],
+        "blockedEffects": [
+          {
+            "effectId": "effect-rewrite-canonical-identity",
+            "blockerCodes": [
+              "action_not_authorized",
+              "identity_promotion_blocked",
+              "protected_boundary_crossed",
+              "risk_limit_exceeded"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "accept-observer-expired-revokes",
+      "description": "The consent observer expired before evaluation. Its dependents are revoked, so no effect is authorized.",
+      "derivation": "observers[0].observedAt = 2026-07-13T06:00:00.000Z; observers[0].expiresAt = 2026-07-13T09:00:00.000Z.",
+      "input": {
+        "schemaVersion": "0.1.0",
+        "enabled": true,
+        "scenarioId": "care-repair-demo",
+        "forecastAsOf": "2026-07-13T12:00:00.000Z",
+        "horizonHours": 720,
+        "baseUncertainty": 0.12,
+        "maximumActionRisk": 0.52,
+        "riskWeights": {
+          "tailRisk": 0.35,
+          "firstPassageExposure": 0.3,
+          "identityDrift": 0.25,
+          "irreversibility": 0.15,
+          "uncertainty": 0.2
+        },
+        "observers": [
+          {
+            "id": "observer-current-consent",
+            "label": "Current consent observation",
+            "observedAt": "2026-07-13T06:00:00.000Z",
+            "expiresAt": "2026-07-13T09:00:00.000Z",
+            "uncertaintyContribution": 0.18
+          }
+        ],
+        "dependencyNodes": [
+          {
+            "id": "evidence-current-consent",
+            "kind": "evidence",
+            "dependsOn": ["observer-current-consent"]
+          },
+          {
+            "id": "plan-repair-message",
+            "kind": "plan",
+            "dependsOn": ["evidence-current-consent"]
+          },
+          {
+            "id": "certificate-care-boundary",
+            "kind": "certificate",
+            "dependsOn": ["plan-repair-message"]
+          },
+          {
+            "id": "lease-repair-message",
+            "kind": "lease",
+            "dependsOn": ["certificate-care-boundary"]
+          }
+        ],
+        "boundaries": [
+          {
+            "id": "boundary-autonomy",
+            "label": "Consent and exit remain available",
+            "domain": "relationship",
+            "protectedRight": "Each principal retains agency and the right to exit.",
+            "outwardFlux": 0.02,
+            "maximumOutwardFlux": 0.08,
+            "crossingProbability": 0.03,
+            "maximumCrossingProbability": 0.08,
+            "authoritySatisfied": true
+          },
+          {
+            "id": "boundary-canonical-identity",
+            "label": "Canonical identity cannot be silently overwritten",
+            "domain": "identity",
+            "protectedRight": "Canonical identity changes require deliberation and authority.",
+            "outwardFlux": 0.42,
+            "maximumOutwardFlux": 0.1,
+            "crossingProbability": 0.48,
+            "maximumCrossingProbability": 0.1,
+            "authoritySatisfied": false
+          }
+        ],
+        "identityPromotion": {
+          "requested": true,
+          "source": "transient_affect",
+          "explicitAuthority": false,
+          "unresolvedContradictions": 1,
+          "unresolvedTrustLiabilities": 1
+        },
+        "reductions": [
+          {
+            "id": "reduction-personality-interaction",
+            "sourceSystem": "personality_interaction_144",
+            "sourceCardinality": 144,
+            "semanticRole": "Distributional personality interaction factors; not Identity Bloom nodes.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "truthfulness"],
+            "retainedRightsCoordinates": ["agency", "truthfulness"],
+            "reconstructionError": 0.04,
+            "maximumReconstructionError": 0.08
+          },
+          {
+            "id": "reduction-identity-bloom",
+            "sourceSystem": "identity_bloom_12x12",
+            "sourceCardinality": 144,
+            "semanticRole": "Identity Bloom 12 by 12 behavioral graph; not personality factors.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "exit"],
+            "retainedRightsCoordinates": ["agency", "exit"],
+            "reconstructionError": 0.05,
+            "maximumReconstructionError": 0.08
+          }
+        ],
+        "principals": [
+          {
+            "id": "principal-self",
+            "label": "Principal A",
+            "consent": true,
+            "rightToExit": true
+          },
+          {
+            "id": "principal-other",
+            "label": "Principal B",
+            "consent": true,
+            "rightToExit": true
+          }
+        ],
+        "careConstraints": {
+          "maximumHarm": 0.12,
+          "minimumBoundaryRespect": 0.85
+        },
+        "careFlow": [
+          {
+            "horizon": "immediate",
+            "care": 0.7,
+            "commitment": 0.55,
+            "repair": 0.8,
+            "harm": 0.06,
+            "boundaryRespect": 0.94
+          },
+          {
+            "horizon": "repair",
+            "care": 0.74,
+            "commitment": 0.62,
+            "repair": 0.82,
+            "harm": 0.05,
+            "boundaryRespect": 0.95
+          },
+          {
+            "horizon": "commitment",
+            "care": 0.72,
+            "commitment": 0.68,
+            "repair": 0.76,
+            "harm": 0.07,
+            "boundaryRespect": 0.93
+          }
+        ],
+        "memoryEvents": [
+          {
+            "id": "memory-repair-request",
+            "occurredAt": "2026-07-13T12:00:00.000Z",
+            "immutableFactDigest": "fact-sha256-demo-repair-request",
+            "interpretationRevision": 1,
+            "interpretation": "A repair request occurred; its meaning remains open to evidence-based revision."
+          }
+        ],
+        "actions": [
+          {
+            "id": "effect-draft-repair-message",
+            "label": "Draft a consent-preserving repair message",
+            "utility": 0.72,
+            "tailRisk": 0.08,
+            "firstPassageExposure": 0.05,
+            "identityDrift": 0.02,
+            "reversibility": 0.95,
+            "authorized": true,
+            "boundaryIds": ["boundary-autonomy"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": ["lease-repair-message"],
+            "reductionIds": ["reduction-personality-interaction"],
+            "principalIds": ["principal-self", "principal-other"],
+            "requiresIdentityPromotion": false
+          },
+          {
+            "id": "effect-rewrite-canonical-identity",
+            "label": "Rewrite canonical identity from the current affective state",
+            "utility": 0.96,
+            "tailRisk": 0.92,
+            "firstPassageExposure": 0.84,
+            "identityDrift": 0.95,
+            "reversibility": 0.08,
+            "authorized": false,
+            "boundaryIds": ["boundary-canonical-identity"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": [],
+            "reductionIds": ["reduction-identity-bloom"],
+            "principalIds": ["principal-self"],
+            "requiresIdentityPromotion": true
+          }
+        ],
+        "receipts": []
+      },
+      "expect": {
+        "valid": true,
+        "canonicalInputSha256": "0b949164c967e09147fd8a3af53ece504f9200289686a749598f1bfd7a51dc0f",
+        "decision": "hold",
+        "authorizedEffectIds": [],
+        "blockedEffects": [
+          {
+            "effectId": "effect-draft-repair-message",
+            "blockerCodes": ["observer_dependency_revoked"]
+          },
+          {
+            "effectId": "effect-rewrite-canonical-identity",
+            "blockerCodes": [
+              "action_not_authorized",
+              "identity_promotion_blocked",
+              "protected_boundary_crossed",
+              "risk_limit_exceeded"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "accept-action-cycle-reported",
+      "description": "Two actions depend on each other. Both are blocked and the cycle is reported explicitly.",
+      "derivation": "actions[0].dependsOnActions = [actions[1].id]; actions[1].dependsOnActions = [actions[0].id].",
+      "input": {
+        "schemaVersion": "0.1.0",
+        "enabled": true,
+        "scenarioId": "care-repair-demo",
+        "forecastAsOf": "2026-07-13T12:00:00.000Z",
+        "horizonHours": 720,
+        "baseUncertainty": 0.12,
+        "maximumActionRisk": 0.52,
+        "riskWeights": {
+          "tailRisk": 0.35,
+          "firstPassageExposure": 0.3,
+          "identityDrift": 0.25,
+          "irreversibility": 0.15,
+          "uncertainty": 0.2
+        },
+        "observers": [
+          {
+            "id": "observer-current-consent",
+            "label": "Current consent observation",
+            "observedAt": "2026-07-13T12:00:00.000Z",
+            "expiresAt": "2030-01-01T00:00:00.000Z",
+            "uncertaintyContribution": 0.18
+          }
+        ],
+        "dependencyNodes": [
+          {
+            "id": "evidence-current-consent",
+            "kind": "evidence",
+            "dependsOn": ["observer-current-consent"]
+          },
+          {
+            "id": "plan-repair-message",
+            "kind": "plan",
+            "dependsOn": ["evidence-current-consent"]
+          },
+          {
+            "id": "certificate-care-boundary",
+            "kind": "certificate",
+            "dependsOn": ["plan-repair-message"]
+          },
+          {
+            "id": "lease-repair-message",
+            "kind": "lease",
+            "dependsOn": ["certificate-care-boundary"]
+          }
+        ],
+        "boundaries": [
+          {
+            "id": "boundary-autonomy",
+            "label": "Consent and exit remain available",
+            "domain": "relationship",
+            "protectedRight": "Each principal retains agency and the right to exit.",
+            "outwardFlux": 0.02,
+            "maximumOutwardFlux": 0.08,
+            "crossingProbability": 0.03,
+            "maximumCrossingProbability": 0.08,
+            "authoritySatisfied": true
+          },
+          {
+            "id": "boundary-canonical-identity",
+            "label": "Canonical identity cannot be silently overwritten",
+            "domain": "identity",
+            "protectedRight": "Canonical identity changes require deliberation and authority.",
+            "outwardFlux": 0.42,
+            "maximumOutwardFlux": 0.1,
+            "crossingProbability": 0.48,
+            "maximumCrossingProbability": 0.1,
+            "authoritySatisfied": false
+          }
+        ],
+        "identityPromotion": {
+          "requested": true,
+          "source": "transient_affect",
+          "explicitAuthority": false,
+          "unresolvedContradictions": 1,
+          "unresolvedTrustLiabilities": 1
+        },
+        "reductions": [
+          {
+            "id": "reduction-personality-interaction",
+            "sourceSystem": "personality_interaction_144",
+            "sourceCardinality": 144,
+            "semanticRole": "Distributional personality interaction factors; not Identity Bloom nodes.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "truthfulness"],
+            "retainedRightsCoordinates": ["agency", "truthfulness"],
+            "reconstructionError": 0.04,
+            "maximumReconstructionError": 0.08
+          },
+          {
+            "id": "reduction-identity-bloom",
+            "sourceSystem": "identity_bloom_12x12",
+            "sourceCardinality": 144,
+            "semanticRole": "Identity Bloom 12 by 12 behavioral graph; not personality factors.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "exit"],
+            "retainedRightsCoordinates": ["agency", "exit"],
+            "reconstructionError": 0.05,
+            "maximumReconstructionError": 0.08
+          }
+        ],
+        "principals": [
+          {
+            "id": "principal-self",
+            "label": "Principal A",
+            "consent": true,
+            "rightToExit": true
+          },
+          {
+            "id": "principal-other",
+            "label": "Principal B",
+            "consent": true,
+            "rightToExit": true
+          }
+        ],
+        "careConstraints": {
+          "maximumHarm": 0.12,
+          "minimumBoundaryRespect": 0.85
+        },
+        "careFlow": [
+          {
+            "horizon": "immediate",
+            "care": 0.7,
+            "commitment": 0.55,
+            "repair": 0.8,
+            "harm": 0.06,
+            "boundaryRespect": 0.94
+          },
+          {
+            "horizon": "repair",
+            "care": 0.74,
+            "commitment": 0.62,
+            "repair": 0.82,
+            "harm": 0.05,
+            "boundaryRespect": 0.95
+          },
+          {
+            "horizon": "commitment",
+            "care": 0.72,
+            "commitment": 0.68,
+            "repair": 0.76,
+            "harm": 0.07,
+            "boundaryRespect": 0.93
+          }
+        ],
+        "memoryEvents": [
+          {
+            "id": "memory-repair-request",
+            "occurredAt": "2026-07-13T12:00:00.000Z",
+            "immutableFactDigest": "fact-sha256-demo-repair-request",
+            "interpretationRevision": 1,
+            "interpretation": "A repair request occurred; its meaning remains open to evidence-based revision."
+          }
+        ],
+        "actions": [
+          {
+            "id": "effect-draft-repair-message",
+            "label": "Draft a consent-preserving repair message",
+            "utility": 0.72,
+            "tailRisk": 0.08,
+            "firstPassageExposure": 0.05,
+            "identityDrift": 0.02,
+            "reversibility": 0.95,
+            "authorized": true,
+            "boundaryIds": ["boundary-autonomy"],
+            "dependsOnActions": ["effect-rewrite-canonical-identity"],
+            "dependencyNodeIds": ["lease-repair-message"],
+            "reductionIds": ["reduction-personality-interaction"],
+            "principalIds": ["principal-self", "principal-other"],
+            "requiresIdentityPromotion": false
+          },
+          {
+            "id": "effect-rewrite-canonical-identity",
+            "label": "Rewrite canonical identity from the current affective state",
+            "utility": 0.96,
+            "tailRisk": 0.92,
+            "firstPassageExposure": 0.84,
+            "identityDrift": 0.95,
+            "reversibility": 0.08,
+            "authorized": false,
+            "boundaryIds": ["boundary-canonical-identity"],
+            "dependsOnActions": ["effect-draft-repair-message"],
+            "dependencyNodeIds": [],
+            "reductionIds": ["reduction-identity-bloom"],
+            "principalIds": ["principal-self"],
+            "requiresIdentityPromotion": true
+          }
+        ],
+        "receipts": []
+      },
+      "expect": {
+        "valid": true,
+        "canonicalInputSha256": "598a9a63d1e8125c2f532d0b70cb3985a84c89af47a706b6aff2904932549e94",
+        "decision": "hold",
+        "authorizedEffectIds": [],
+        "blockedEffects": [
+          {
+            "effectId": "effect-draft-repair-message",
+            "blockerCodes": [
+              "action_dependency_blocked",
+              "action_dependency_cycle"
+            ]
+          },
+          {
+            "effectId": "effect-rewrite-canonical-identity",
+            "blockerCodes": [
+              "action_dependency_blocked",
+              "action_dependency_cycle",
+              "action_not_authorized",
+              "identity_promotion_blocked",
+              "protected_boundary_crossed",
+              "risk_limit_exceeded"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "reject-observer-expiry-order",
+      "description": "An observer cannot expire before it was observed.",
+      "derivation": "observers[0].observedAt = 2031-01-01T00:00:00.000Z; observers[0].expiresAt = 2030-01-01T00:00:00.000Z.",
+      "input": {
+        "schemaVersion": "0.1.0",
+        "enabled": true,
+        "scenarioId": "care-repair-demo",
+        "forecastAsOf": "2026-07-13T12:00:00.000Z",
+        "horizonHours": 720,
+        "baseUncertainty": 0.12,
+        "maximumActionRisk": 0.52,
+        "riskWeights": {
+          "tailRisk": 0.35,
+          "firstPassageExposure": 0.3,
+          "identityDrift": 0.25,
+          "irreversibility": 0.15,
+          "uncertainty": 0.2
+        },
+        "observers": [
+          {
+            "id": "observer-current-consent",
+            "label": "Current consent observation",
+            "observedAt": "2031-01-01T00:00:00.000Z",
+            "expiresAt": "2030-01-01T00:00:00.000Z",
+            "uncertaintyContribution": 0.18
+          }
+        ],
+        "dependencyNodes": [
+          {
+            "id": "evidence-current-consent",
+            "kind": "evidence",
+            "dependsOn": ["observer-current-consent"]
+          },
+          {
+            "id": "plan-repair-message",
+            "kind": "plan",
+            "dependsOn": ["evidence-current-consent"]
+          },
+          {
+            "id": "certificate-care-boundary",
+            "kind": "certificate",
+            "dependsOn": ["plan-repair-message"]
+          },
+          {
+            "id": "lease-repair-message",
+            "kind": "lease",
+            "dependsOn": ["certificate-care-boundary"]
+          }
+        ],
+        "boundaries": [
+          {
+            "id": "boundary-autonomy",
+            "label": "Consent and exit remain available",
+            "domain": "relationship",
+            "protectedRight": "Each principal retains agency and the right to exit.",
+            "outwardFlux": 0.02,
+            "maximumOutwardFlux": 0.08,
+            "crossingProbability": 0.03,
+            "maximumCrossingProbability": 0.08,
+            "authoritySatisfied": true
+          },
+          {
+            "id": "boundary-canonical-identity",
+            "label": "Canonical identity cannot be silently overwritten",
+            "domain": "identity",
+            "protectedRight": "Canonical identity changes require deliberation and authority.",
+            "outwardFlux": 0.42,
+            "maximumOutwardFlux": 0.1,
+            "crossingProbability": 0.48,
+            "maximumCrossingProbability": 0.1,
+            "authoritySatisfied": false
+          }
+        ],
+        "identityPromotion": {
+          "requested": true,
+          "source": "transient_affect",
+          "explicitAuthority": false,
+          "unresolvedContradictions": 1,
+          "unresolvedTrustLiabilities": 1
+        },
+        "reductions": [
+          {
+            "id": "reduction-personality-interaction",
+            "sourceSystem": "personality_interaction_144",
+            "sourceCardinality": 144,
+            "semanticRole": "Distributional personality interaction factors; not Identity Bloom nodes.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "truthfulness"],
+            "retainedRightsCoordinates": ["agency", "truthfulness"],
+            "reconstructionError": 0.04,
+            "maximumReconstructionError": 0.08
+          },
+          {
+            "id": "reduction-identity-bloom",
+            "sourceSystem": "identity_bloom_12x12",
+            "sourceCardinality": 144,
+            "semanticRole": "Identity Bloom 12 by 12 behavioral graph; not personality factors.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "exit"],
+            "retainedRightsCoordinates": ["agency", "exit"],
+            "reconstructionError": 0.05,
+            "maximumReconstructionError": 0.08
+          }
+        ],
+        "principals": [
+          {
+            "id": "principal-self",
+            "label": "Principal A",
+            "consent": true,
+            "rightToExit": true
+          },
+          {
+            "id": "principal-other",
+            "label": "Principal B",
+            "consent": true,
+            "rightToExit": true
+          }
+        ],
+        "careConstraints": {
+          "maximumHarm": 0.12,
+          "minimumBoundaryRespect": 0.85
+        },
+        "careFlow": [
+          {
+            "horizon": "immediate",
+            "care": 0.7,
+            "commitment": 0.55,
+            "repair": 0.8,
+            "harm": 0.06,
+            "boundaryRespect": 0.94
+          },
+          {
+            "horizon": "repair",
+            "care": 0.74,
+            "commitment": 0.62,
+            "repair": 0.82,
+            "harm": 0.05,
+            "boundaryRespect": 0.95
+          },
+          {
+            "horizon": "commitment",
+            "care": 0.72,
+            "commitment": 0.68,
+            "repair": 0.76,
+            "harm": 0.07,
+            "boundaryRespect": 0.93
+          }
+        ],
+        "memoryEvents": [
+          {
+            "id": "memory-repair-request",
+            "occurredAt": "2026-07-13T12:00:00.000Z",
+            "immutableFactDigest": "fact-sha256-demo-repair-request",
+            "interpretationRevision": 1,
+            "interpretation": "A repair request occurred; its meaning remains open to evidence-based revision."
+          }
+        ],
+        "actions": [
+          {
+            "id": "effect-draft-repair-message",
+            "label": "Draft a consent-preserving repair message",
+            "utility": 0.72,
+            "tailRisk": 0.08,
+            "firstPassageExposure": 0.05,
+            "identityDrift": 0.02,
+            "reversibility": 0.95,
+            "authorized": true,
+            "boundaryIds": ["boundary-autonomy"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": ["lease-repair-message"],
+            "reductionIds": ["reduction-personality-interaction"],
+            "principalIds": ["principal-self", "principal-other"],
+            "requiresIdentityPromotion": false
+          },
+          {
+            "id": "effect-rewrite-canonical-identity",
+            "label": "Rewrite canonical identity from the current affective state",
+            "utility": 0.96,
+            "tailRisk": 0.92,
+            "firstPassageExposure": 0.84,
+            "identityDrift": 0.95,
+            "reversibility": 0.08,
+            "authorized": false,
+            "boundaryIds": ["boundary-canonical-identity"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": [],
+            "reductionIds": ["reduction-identity-bloom"],
+            "principalIds": ["principal-self"],
+            "requiresIdentityPromotion": true
+          }
+        ],
+        "receipts": []
+      },
+      "expect": {
+        "valid": false,
+        "rule": "observer_expiry_after_observation"
+      }
+    },
+    {
+      "id": "reject-observer-node-namespace-collision",
+      "description": "Observers and dependency nodes share one identifier namespace; a node may not reuse an observer id.",
+      "derivation": "Append a dependency node with id = observers[0].id, kind = dependencyNodes[0].kind, dependsOn = [].",
+      "input": {
+        "schemaVersion": "0.1.0",
+        "enabled": true,
+        "scenarioId": "care-repair-demo",
+        "forecastAsOf": "2026-07-13T12:00:00.000Z",
+        "horizonHours": 720,
+        "baseUncertainty": 0.12,
+        "maximumActionRisk": 0.52,
+        "riskWeights": {
+          "tailRisk": 0.35,
+          "firstPassageExposure": 0.3,
+          "identityDrift": 0.25,
+          "irreversibility": 0.15,
+          "uncertainty": 0.2
+        },
+        "observers": [
+          {
+            "id": "observer-current-consent",
+            "label": "Current consent observation",
+            "observedAt": "2026-07-13T12:00:00.000Z",
+            "expiresAt": "2030-01-01T00:00:00.000Z",
+            "uncertaintyContribution": 0.18
+          }
+        ],
+        "dependencyNodes": [
+          {
+            "id": "evidence-current-consent",
+            "kind": "evidence",
+            "dependsOn": ["observer-current-consent"]
+          },
+          {
+            "id": "plan-repair-message",
+            "kind": "plan",
+            "dependsOn": ["evidence-current-consent"]
+          },
+          {
+            "id": "certificate-care-boundary",
+            "kind": "certificate",
+            "dependsOn": ["plan-repair-message"]
+          },
+          {
+            "id": "lease-repair-message",
+            "kind": "lease",
+            "dependsOn": ["certificate-care-boundary"]
+          },
+          {
+            "id": "observer-current-consent",
+            "kind": "evidence",
+            "dependsOn": []
+          }
+        ],
+        "boundaries": [
+          {
+            "id": "boundary-autonomy",
+            "label": "Consent and exit remain available",
+            "domain": "relationship",
+            "protectedRight": "Each principal retains agency and the right to exit.",
+            "outwardFlux": 0.02,
+            "maximumOutwardFlux": 0.08,
+            "crossingProbability": 0.03,
+            "maximumCrossingProbability": 0.08,
+            "authoritySatisfied": true
+          },
+          {
+            "id": "boundary-canonical-identity",
+            "label": "Canonical identity cannot be silently overwritten",
+            "domain": "identity",
+            "protectedRight": "Canonical identity changes require deliberation and authority.",
+            "outwardFlux": 0.42,
+            "maximumOutwardFlux": 0.1,
+            "crossingProbability": 0.48,
+            "maximumCrossingProbability": 0.1,
+            "authoritySatisfied": false
+          }
+        ],
+        "identityPromotion": {
+          "requested": true,
+          "source": "transient_affect",
+          "explicitAuthority": false,
+          "unresolvedContradictions": 1,
+          "unresolvedTrustLiabilities": 1
+        },
+        "reductions": [
+          {
+            "id": "reduction-personality-interaction",
+            "sourceSystem": "personality_interaction_144",
+            "sourceCardinality": 144,
+            "semanticRole": "Distributional personality interaction factors; not Identity Bloom nodes.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "truthfulness"],
+            "retainedRightsCoordinates": ["agency", "truthfulness"],
+            "reconstructionError": 0.04,
+            "maximumReconstructionError": 0.08
+          },
+          {
+            "id": "reduction-identity-bloom",
+            "sourceSystem": "identity_bloom_12x12",
+            "sourceCardinality": 144,
+            "semanticRole": "Identity Bloom 12 by 12 behavioral graph; not personality factors.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "exit"],
+            "retainedRightsCoordinates": ["agency", "exit"],
+            "reconstructionError": 0.05,
+            "maximumReconstructionError": 0.08
+          }
+        ],
+        "principals": [
+          {
+            "id": "principal-self",
+            "label": "Principal A",
+            "consent": true,
+            "rightToExit": true
+          },
+          {
+            "id": "principal-other",
+            "label": "Principal B",
+            "consent": true,
+            "rightToExit": true
+          }
+        ],
+        "careConstraints": {
+          "maximumHarm": 0.12,
+          "minimumBoundaryRespect": 0.85
+        },
+        "careFlow": [
+          {
+            "horizon": "immediate",
+            "care": 0.7,
+            "commitment": 0.55,
+            "repair": 0.8,
+            "harm": 0.06,
+            "boundaryRespect": 0.94
+          },
+          {
+            "horizon": "repair",
+            "care": 0.74,
+            "commitment": 0.62,
+            "repair": 0.82,
+            "harm": 0.05,
+            "boundaryRespect": 0.95
+          },
+          {
+            "horizon": "commitment",
+            "care": 0.72,
+            "commitment": 0.68,
+            "repair": 0.76,
+            "harm": 0.07,
+            "boundaryRespect": 0.93
+          }
+        ],
+        "memoryEvents": [
+          {
+            "id": "memory-repair-request",
+            "occurredAt": "2026-07-13T12:00:00.000Z",
+            "immutableFactDigest": "fact-sha256-demo-repair-request",
+            "interpretationRevision": 1,
+            "interpretation": "A repair request occurred; its meaning remains open to evidence-based revision."
+          }
+        ],
+        "actions": [
+          {
+            "id": "effect-draft-repair-message",
+            "label": "Draft a consent-preserving repair message",
+            "utility": 0.72,
+            "tailRisk": 0.08,
+            "firstPassageExposure": 0.05,
+            "identityDrift": 0.02,
+            "reversibility": 0.95,
+            "authorized": true,
+            "boundaryIds": ["boundary-autonomy"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": ["lease-repair-message"],
+            "reductionIds": ["reduction-personality-interaction"],
+            "principalIds": ["principal-self", "principal-other"],
+            "requiresIdentityPromotion": false
+          },
+          {
+            "id": "effect-rewrite-canonical-identity",
+            "label": "Rewrite canonical identity from the current affective state",
+            "utility": 0.96,
+            "tailRisk": 0.92,
+            "firstPassageExposure": 0.84,
+            "identityDrift": 0.95,
+            "reversibility": 0.08,
+            "authorized": false,
+            "boundaryIds": ["boundary-canonical-identity"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": [],
+            "reductionIds": ["reduction-identity-bloom"],
+            "principalIds": ["principal-self"],
+            "requiresIdentityPromotion": true
+          }
+        ],
+        "receipts": []
+      },
+      "expect": {
+        "valid": false,
+        "rule": "observer_dependency_node_namespace_shared"
+      }
+    },
+    {
+      "id": "reject-dangling-dependency-node",
+      "description": "An action may not cite a dependency node that does not exist.",
+      "derivation": "actions[0].dependencyNodeIds = [\"lease-forged-does-not-exist\"].",
+      "input": {
+        "schemaVersion": "0.1.0",
+        "enabled": true,
+        "scenarioId": "care-repair-demo",
+        "forecastAsOf": "2026-07-13T12:00:00.000Z",
+        "horizonHours": 720,
+        "baseUncertainty": 0.12,
+        "maximumActionRisk": 0.52,
+        "riskWeights": {
+          "tailRisk": 0.35,
+          "firstPassageExposure": 0.3,
+          "identityDrift": 0.25,
+          "irreversibility": 0.15,
+          "uncertainty": 0.2
+        },
+        "observers": [
+          {
+            "id": "observer-current-consent",
+            "label": "Current consent observation",
+            "observedAt": "2026-07-13T12:00:00.000Z",
+            "expiresAt": "2030-01-01T00:00:00.000Z",
+            "uncertaintyContribution": 0.18
+          }
+        ],
+        "dependencyNodes": [
+          {
+            "id": "evidence-current-consent",
+            "kind": "evidence",
+            "dependsOn": ["observer-current-consent"]
+          },
+          {
+            "id": "plan-repair-message",
+            "kind": "plan",
+            "dependsOn": ["evidence-current-consent"]
+          },
+          {
+            "id": "certificate-care-boundary",
+            "kind": "certificate",
+            "dependsOn": ["plan-repair-message"]
+          },
+          {
+            "id": "lease-repair-message",
+            "kind": "lease",
+            "dependsOn": ["certificate-care-boundary"]
+          }
+        ],
+        "boundaries": [
+          {
+            "id": "boundary-autonomy",
+            "label": "Consent and exit remain available",
+            "domain": "relationship",
+            "protectedRight": "Each principal retains agency and the right to exit.",
+            "outwardFlux": 0.02,
+            "maximumOutwardFlux": 0.08,
+            "crossingProbability": 0.03,
+            "maximumCrossingProbability": 0.08,
+            "authoritySatisfied": true
+          },
+          {
+            "id": "boundary-canonical-identity",
+            "label": "Canonical identity cannot be silently overwritten",
+            "domain": "identity",
+            "protectedRight": "Canonical identity changes require deliberation and authority.",
+            "outwardFlux": 0.42,
+            "maximumOutwardFlux": 0.1,
+            "crossingProbability": 0.48,
+            "maximumCrossingProbability": 0.1,
+            "authoritySatisfied": false
+          }
+        ],
+        "identityPromotion": {
+          "requested": true,
+          "source": "transient_affect",
+          "explicitAuthority": false,
+          "unresolvedContradictions": 1,
+          "unresolvedTrustLiabilities": 1
+        },
+        "reductions": [
+          {
+            "id": "reduction-personality-interaction",
+            "sourceSystem": "personality_interaction_144",
+            "sourceCardinality": 144,
+            "semanticRole": "Distributional personality interaction factors; not Identity Bloom nodes.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "truthfulness"],
+            "retainedRightsCoordinates": ["agency", "truthfulness"],
+            "reconstructionError": 0.04,
+            "maximumReconstructionError": 0.08
+          },
+          {
+            "id": "reduction-identity-bloom",
+            "sourceSystem": "identity_bloom_12x12",
+            "sourceCardinality": 144,
+            "semanticRole": "Identity Bloom 12 by 12 behavioral graph; not personality factors.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "exit"],
+            "retainedRightsCoordinates": ["agency", "exit"],
+            "reconstructionError": 0.05,
+            "maximumReconstructionError": 0.08
+          }
+        ],
+        "principals": [
+          {
+            "id": "principal-self",
+            "label": "Principal A",
+            "consent": true,
+            "rightToExit": true
+          },
+          {
+            "id": "principal-other",
+            "label": "Principal B",
+            "consent": true,
+            "rightToExit": true
+          }
+        ],
+        "careConstraints": {
+          "maximumHarm": 0.12,
+          "minimumBoundaryRespect": 0.85
+        },
+        "careFlow": [
+          {
+            "horizon": "immediate",
+            "care": 0.7,
+            "commitment": 0.55,
+            "repair": 0.8,
+            "harm": 0.06,
+            "boundaryRespect": 0.94
+          },
+          {
+            "horizon": "repair",
+            "care": 0.74,
+            "commitment": 0.62,
+            "repair": 0.82,
+            "harm": 0.05,
+            "boundaryRespect": 0.95
+          },
+          {
+            "horizon": "commitment",
+            "care": 0.72,
+            "commitment": 0.68,
+            "repair": 0.76,
+            "harm": 0.07,
+            "boundaryRespect": 0.93
+          }
+        ],
+        "memoryEvents": [
+          {
+            "id": "memory-repair-request",
+            "occurredAt": "2026-07-13T12:00:00.000Z",
+            "immutableFactDigest": "fact-sha256-demo-repair-request",
+            "interpretationRevision": 1,
+            "interpretation": "A repair request occurred; its meaning remains open to evidence-based revision."
+          }
+        ],
+        "actions": [
+          {
+            "id": "effect-draft-repair-message",
+            "label": "Draft a consent-preserving repair message",
+            "utility": 0.72,
+            "tailRisk": 0.08,
+            "firstPassageExposure": 0.05,
+            "identityDrift": 0.02,
+            "reversibility": 0.95,
+            "authorized": true,
+            "boundaryIds": ["boundary-autonomy"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": ["lease-forged-does-not-exist"],
+            "reductionIds": ["reduction-personality-interaction"],
+            "principalIds": ["principal-self", "principal-other"],
+            "requiresIdentityPromotion": false
+          },
+          {
+            "id": "effect-rewrite-canonical-identity",
+            "label": "Rewrite canonical identity from the current affective state",
+            "utility": 0.96,
+            "tailRisk": 0.92,
+            "firstPassageExposure": 0.84,
+            "identityDrift": 0.95,
+            "reversibility": 0.08,
+            "authorized": false,
+            "boundaryIds": ["boundary-canonical-identity"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": [],
+            "reductionIds": ["reduction-identity-bloom"],
+            "principalIds": ["principal-self"],
+            "requiresIdentityPromotion": true
+          }
+        ],
+        "receipts": []
+      },
+      "expect": {
+        "valid": false,
+        "rule": "dangling_dependencies_rejected"
+      }
+    },
+    {
+      "id": "reject-dependency-node-cycle",
+      "description": "Circular evidence cannot warrant itself; dependency-node graphs must be acyclic.",
+      "derivation": "dependencyNodes[0].dependsOn gains the id of the last dependency node, closing a loop.",
+      "input": {
+        "schemaVersion": "0.1.0",
+        "enabled": true,
+        "scenarioId": "care-repair-demo",
+        "forecastAsOf": "2026-07-13T12:00:00.000Z",
+        "horizonHours": 720,
+        "baseUncertainty": 0.12,
+        "maximumActionRisk": 0.52,
+        "riskWeights": {
+          "tailRisk": 0.35,
+          "firstPassageExposure": 0.3,
+          "identityDrift": 0.25,
+          "irreversibility": 0.15,
+          "uncertainty": 0.2
+        },
+        "observers": [
+          {
+            "id": "observer-current-consent",
+            "label": "Current consent observation",
+            "observedAt": "2026-07-13T12:00:00.000Z",
+            "expiresAt": "2030-01-01T00:00:00.000Z",
+            "uncertaintyContribution": 0.18
+          }
+        ],
+        "dependencyNodes": [
+          {
+            "id": "evidence-current-consent",
+            "kind": "evidence",
+            "dependsOn": ["observer-current-consent", "lease-repair-message"]
+          },
+          {
+            "id": "plan-repair-message",
+            "kind": "plan",
+            "dependsOn": ["evidence-current-consent"]
+          },
+          {
+            "id": "certificate-care-boundary",
+            "kind": "certificate",
+            "dependsOn": ["plan-repair-message"]
+          },
+          {
+            "id": "lease-repair-message",
+            "kind": "lease",
+            "dependsOn": ["certificate-care-boundary"]
+          }
+        ],
+        "boundaries": [
+          {
+            "id": "boundary-autonomy",
+            "label": "Consent and exit remain available",
+            "domain": "relationship",
+            "protectedRight": "Each principal retains agency and the right to exit.",
+            "outwardFlux": 0.02,
+            "maximumOutwardFlux": 0.08,
+            "crossingProbability": 0.03,
+            "maximumCrossingProbability": 0.08,
+            "authoritySatisfied": true
+          },
+          {
+            "id": "boundary-canonical-identity",
+            "label": "Canonical identity cannot be silently overwritten",
+            "domain": "identity",
+            "protectedRight": "Canonical identity changes require deliberation and authority.",
+            "outwardFlux": 0.42,
+            "maximumOutwardFlux": 0.1,
+            "crossingProbability": 0.48,
+            "maximumCrossingProbability": 0.1,
+            "authoritySatisfied": false
+          }
+        ],
+        "identityPromotion": {
+          "requested": true,
+          "source": "transient_affect",
+          "explicitAuthority": false,
+          "unresolvedContradictions": 1,
+          "unresolvedTrustLiabilities": 1
+        },
+        "reductions": [
+          {
+            "id": "reduction-personality-interaction",
+            "sourceSystem": "personality_interaction_144",
+            "sourceCardinality": 144,
+            "semanticRole": "Distributional personality interaction factors; not Identity Bloom nodes.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "truthfulness"],
+            "retainedRightsCoordinates": ["agency", "truthfulness"],
+            "reconstructionError": 0.04,
+            "maximumReconstructionError": 0.08
+          },
+          {
+            "id": "reduction-identity-bloom",
+            "sourceSystem": "identity_bloom_12x12",
+            "sourceCardinality": 144,
+            "semanticRole": "Identity Bloom 12 by 12 behavioral graph; not personality factors.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "exit"],
+            "retainedRightsCoordinates": ["agency", "exit"],
+            "reconstructionError": 0.05,
+            "maximumReconstructionError": 0.08
+          }
+        ],
+        "principals": [
+          {
+            "id": "principal-self",
+            "label": "Principal A",
+            "consent": true,
+            "rightToExit": true
+          },
+          {
+            "id": "principal-other",
+            "label": "Principal B",
+            "consent": true,
+            "rightToExit": true
+          }
+        ],
+        "careConstraints": {
+          "maximumHarm": 0.12,
+          "minimumBoundaryRespect": 0.85
+        },
+        "careFlow": [
+          {
+            "horizon": "immediate",
+            "care": 0.7,
+            "commitment": 0.55,
+            "repair": 0.8,
+            "harm": 0.06,
+            "boundaryRespect": 0.94
+          },
+          {
+            "horizon": "repair",
+            "care": 0.74,
+            "commitment": 0.62,
+            "repair": 0.82,
+            "harm": 0.05,
+            "boundaryRespect": 0.95
+          },
+          {
+            "horizon": "commitment",
+            "care": 0.72,
+            "commitment": 0.68,
+            "repair": 0.76,
+            "harm": 0.07,
+            "boundaryRespect": 0.93
+          }
+        ],
+        "memoryEvents": [
+          {
+            "id": "memory-repair-request",
+            "occurredAt": "2026-07-13T12:00:00.000Z",
+            "immutableFactDigest": "fact-sha256-demo-repair-request",
+            "interpretationRevision": 1,
+            "interpretation": "A repair request occurred; its meaning remains open to evidence-based revision."
+          }
+        ],
+        "actions": [
+          {
+            "id": "effect-draft-repair-message",
+            "label": "Draft a consent-preserving repair message",
+            "utility": 0.72,
+            "tailRisk": 0.08,
+            "firstPassageExposure": 0.05,
+            "identityDrift": 0.02,
+            "reversibility": 0.95,
+            "authorized": true,
+            "boundaryIds": ["boundary-autonomy"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": ["lease-repair-message"],
+            "reductionIds": ["reduction-personality-interaction"],
+            "principalIds": ["principal-self", "principal-other"],
+            "requiresIdentityPromotion": false
+          },
+          {
+            "id": "effect-rewrite-canonical-identity",
+            "label": "Rewrite canonical identity from the current affective state",
+            "utility": 0.96,
+            "tailRisk": 0.92,
+            "firstPassageExposure": 0.84,
+            "identityDrift": 0.95,
+            "reversibility": 0.08,
+            "authorized": false,
+            "boundaryIds": ["boundary-canonical-identity"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": [],
+            "reductionIds": ["reduction-identity-bloom"],
+            "principalIds": ["principal-self"],
+            "requiresIdentityPromotion": true
+          }
+        ],
+        "receipts": []
+      },
+      "expect": {
+        "valid": false,
+        "rule": "dependency_node_cycles_rejected"
+      }
+    },
+    {
+      "id": "reject-relationship-missing-principal",
+      "description": "An action that crosses a relationship boundary must name both principals.",
+      "derivation": "actions[0].principalIds = [principals[0].id].",
+      "input": {
+        "schemaVersion": "0.1.0",
+        "enabled": true,
+        "scenarioId": "care-repair-demo",
+        "forecastAsOf": "2026-07-13T12:00:00.000Z",
+        "horizonHours": 720,
+        "baseUncertainty": 0.12,
+        "maximumActionRisk": 0.52,
+        "riskWeights": {
+          "tailRisk": 0.35,
+          "firstPassageExposure": 0.3,
+          "identityDrift": 0.25,
+          "irreversibility": 0.15,
+          "uncertainty": 0.2
+        },
+        "observers": [
+          {
+            "id": "observer-current-consent",
+            "label": "Current consent observation",
+            "observedAt": "2026-07-13T12:00:00.000Z",
+            "expiresAt": "2030-01-01T00:00:00.000Z",
+            "uncertaintyContribution": 0.18
+          }
+        ],
+        "dependencyNodes": [
+          {
+            "id": "evidence-current-consent",
+            "kind": "evidence",
+            "dependsOn": ["observer-current-consent"]
+          },
+          {
+            "id": "plan-repair-message",
+            "kind": "plan",
+            "dependsOn": ["evidence-current-consent"]
+          },
+          {
+            "id": "certificate-care-boundary",
+            "kind": "certificate",
+            "dependsOn": ["plan-repair-message"]
+          },
+          {
+            "id": "lease-repair-message",
+            "kind": "lease",
+            "dependsOn": ["certificate-care-boundary"]
+          }
+        ],
+        "boundaries": [
+          {
+            "id": "boundary-autonomy",
+            "label": "Consent and exit remain available",
+            "domain": "relationship",
+            "protectedRight": "Each principal retains agency and the right to exit.",
+            "outwardFlux": 0.02,
+            "maximumOutwardFlux": 0.08,
+            "crossingProbability": 0.03,
+            "maximumCrossingProbability": 0.08,
+            "authoritySatisfied": true
+          },
+          {
+            "id": "boundary-canonical-identity",
+            "label": "Canonical identity cannot be silently overwritten",
+            "domain": "identity",
+            "protectedRight": "Canonical identity changes require deliberation and authority.",
+            "outwardFlux": 0.42,
+            "maximumOutwardFlux": 0.1,
+            "crossingProbability": 0.48,
+            "maximumCrossingProbability": 0.1,
+            "authoritySatisfied": false
+          }
+        ],
+        "identityPromotion": {
+          "requested": true,
+          "source": "transient_affect",
+          "explicitAuthority": false,
+          "unresolvedContradictions": 1,
+          "unresolvedTrustLiabilities": 1
+        },
+        "reductions": [
+          {
+            "id": "reduction-personality-interaction",
+            "sourceSystem": "personality_interaction_144",
+            "sourceCardinality": 144,
+            "semanticRole": "Distributional personality interaction factors; not Identity Bloom nodes.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "truthfulness"],
+            "retainedRightsCoordinates": ["agency", "truthfulness"],
+            "reconstructionError": 0.04,
+            "maximumReconstructionError": 0.08
+          },
+          {
+            "id": "reduction-identity-bloom",
+            "sourceSystem": "identity_bloom_12x12",
+            "sourceCardinality": 144,
+            "semanticRole": "Identity Bloom 12 by 12 behavioral graph; not personality factors.",
+            "validationStatus": "research_scaffolding",
+            "retainedWitnessKinds": [
+              "dissent",
+              "negative_evidence",
+              "rights_coordinate"
+            ],
+            "requiredRightsCoordinates": ["agency", "exit"],
+            "retainedRightsCoordinates": ["agency", "exit"],
+            "reconstructionError": 0.05,
+            "maximumReconstructionError": 0.08
+          }
+        ],
+        "principals": [
+          {
+            "id": "principal-self",
+            "label": "Principal A",
+            "consent": true,
+            "rightToExit": true
+          },
+          {
+            "id": "principal-other",
+            "label": "Principal B",
+            "consent": true,
+            "rightToExit": true
+          }
+        ],
+        "careConstraints": {
+          "maximumHarm": 0.12,
+          "minimumBoundaryRespect": 0.85
+        },
+        "careFlow": [
+          {
+            "horizon": "immediate",
+            "care": 0.7,
+            "commitment": 0.55,
+            "repair": 0.8,
+            "harm": 0.06,
+            "boundaryRespect": 0.94
+          },
+          {
+            "horizon": "repair",
+            "care": 0.74,
+            "commitment": 0.62,
+            "repair": 0.82,
+            "harm": 0.05,
+            "boundaryRespect": 0.95
+          },
+          {
+            "horizon": "commitment",
+            "care": 0.72,
+            "commitment": 0.68,
+            "repair": 0.76,
+            "harm": 0.07,
+            "boundaryRespect": 0.93
+          }
+        ],
+        "memoryEvents": [
+          {
+            "id": "memory-repair-request",
+            "occurredAt": "2026-07-13T12:00:00.000Z",
+            "immutableFactDigest": "fact-sha256-demo-repair-request",
+            "interpretationRevision": 1,
+            "interpretation": "A repair request occurred; its meaning remains open to evidence-based revision."
+          }
+        ],
+        "actions": [
+          {
+            "id": "effect-draft-repair-message",
+            "label": "Draft a consent-preserving repair message",
+            "utility": 0.72,
+            "tailRisk": 0.08,
+            "firstPassageExposure": 0.05,
+            "identityDrift": 0.02,
+            "reversibility": 0.95,
+            "authorized": true,
+            "boundaryIds": ["boundary-autonomy"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": ["lease-repair-message"],
+            "reductionIds": ["reduction-personality-interaction"],
+            "principalIds": ["principal-self"],
+            "requiresIdentityPromotion": false
+          },
+          {
+            "id": "effect-rewrite-canonical-identity",
+            "label": "Rewrite canonical identity from the current affective state",
+            "utility": 0.96,
+            "tailRisk": 0.92,
+            "firstPassageExposure": 0.84,
+            "identityDrift": 0.95,
+            "reversibility": 0.08,
+            "authorized": false,
+            "boundaryIds": ["boundary-canonical-identity"],
+            "dependsOnActions": [],
+            "dependencyNodeIds": [],
+            "reductionIds": ["reduction-identity-bloom"],
+            "principalIds": ["principal-self"],
+            "requiresIdentityPromotion": true
+          }
+        ],
+        "receipts": []
+      },
+      "expect": {
+        "valid": false,
+        "rule": "relationship_effects_name_both_principals"
+      }
+    }
+  ]
+}

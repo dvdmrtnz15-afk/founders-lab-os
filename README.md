@@ -49,14 +49,14 @@ with an audit trail is becoming a prerequisite for deployment, not a feature.
 
 ## Design principles
 
-| Principle                         | How the code enforces it                                                                                                                                                                                                        |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Proposal is not permission        | Model output is only a proposal. Self-confidence and multi-agent consensus count as zero proof (`self_confidence_counts_as_proof: false` in the [public contract](public/tet-noesis-contract.yaml)).                            |
-| Authority scales with consequence | Four warrant tiers set the proof, uncertainty, verifier, and human-approval thresholds.                                                                                                                                         |
-| Leases, not standing permissions  | Authority is a capability lease with a named scope, an explicit tool list, a bounded budget, an optional expiry, and an approval flag. Issuing a receipt revokes it.                                                            |
-| Approval binds to content         | A human approval is bound to a fingerprint of the exact objective, state, evidence, tier, and lease it was given for. Any change voids it, and the kernel enforces this, not just the UI. Imported files never carry authority. |
-| Fail closed                       | Missing state, expired or inactive leases, and failed evidence produce `BLOCK`. Unknown fields and malformed files are rejected at import. There is no default allow.                                                           |
-| Every decision is explainable     | Every non-allow decision carries typed blocker codes (16 today), split into hard blocks and soft "needs more proof" holds.                                                                                                      |
+| Principle                         | How the code enforces it                                                                                                                                                                                                                                   |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Proposal is not permission        | Model output is only a proposal. Self-confidence and multi-agent consensus count as zero proof (`self_confidence_counts_as_proof: false` in the [public contract](public/tet-noesis-contract.yaml)).                                                       |
+| Authority scales with consequence | Four warrant tiers set the proof, uncertainty, verifier, and human-approval thresholds.                                                                                                                                                                    |
+| Leases, not standing permissions  | Authority is a capability lease with a named scope, an explicit tool list, a bounded budget, an optional expiry, and an approval flag. Issuing a receipt revokes it.                                                                                       |
+| Approval binds to content         | A human approval is bound to a fingerprint of the exact objective, state, evidence, tier, lease, and probability-flow envelope it was given for. Any change voids it, and the kernel enforces this, not just the UI. Imported files never carry authority. |
+| Fail closed                       | Missing state, expired or inactive leases, and failed evidence produce `BLOCK`. Unknown fields and malformed files are rejected at import. There is no default allow.                                                                                      |
+| Every decision is explainable     | Every non-allow decision carries typed blocker codes (19 today), split into hard blocks and soft "needs more proof" holds.                                                                                                                                 |
 
 ## Architecture
 
@@ -143,18 +143,39 @@ example:
 }
 ```
 
+### Probability flow and conformance vectors
+
+Before an effect can enter a Noesis receipt, the Invariant Probability Flow
+protocol (`0.1.0`) resolves which candidate effects are safe to authorize. It
+weighs distributional action risk, protected-boundary crossings, identity
+drift, observer staleness, and two-principal consent, then authorizes only a
+dependency-closed subset. Each resolution emits a replayable receipt, and the
+warrant blocks if the inputs drift from it.
+
+The protocol is meant to run in more than one runtime, so it ships with an
+executable specification:
+[`public/ipf-conformance-v0.1.0.json`](public/ipf-conformance-v0.1.0.json).
+Each vector pairs a complete input with its exact expected outcome: the
+canonical-input SHA-256, the decision, the authorized effects, and every
+blocker code. Five vectors must be rejected outright, including circular
+evidence, references to nodes that do not exist, and relationship effects that
+omit the second person. A runtime conforms only if every vector passes. The
+reference runs them in CI.
+
 ### Source map
 
-| Layer                     | Source                                                               | What to look for                                                                              |
-| ------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| Trust boundary            | [`src/lib/noesis-schema.ts`](src/lib/noesis-schema.ts)               | Strict Zod objects, bounded sizes, versioned schema                                           |
-| Decision kernel           | [`src/lib/noesis.ts`](src/lib/noesis.ts)                             | `evaluateWarrant`, `warrantPolicies`, `issueDryRunReceipt`                                    |
-| Content-bound approvals   | [`src/lib/noesis.ts`](src/lib/noesis.ts)                             | `authorityFingerprint`, `reconcileApproval`, `stripImportedAuthority`                         |
-| Revision-bound packets    | [`src/lib/exchange/model.ts`](src/lib/exchange/model.ts)             | `packetApprovalValid`, `importWorkspace` (imports strip authority)                            |
-| Encrypted vault           | [`src/lib/exchange/vault.ts`](src/lib/exchange/vault.ts)             | AES-256-GCM, PBKDF2-SHA256, authenticated format binding, input bounded before key derivation |
-| Machine-readable contract | [`public/tet-noesis-contract.yaml`](public/tet-noesis-contract.yaml) | The policy as data: tiers, authority rules, execution limits                                  |
-| Agent operator package    | [`skills/govern-tet-noesis/`](skills/govern-tet-noesis/SKILL.md)     | A provider-neutral skill that applies the same warrant loop inside coding agents              |
-| Tests                     | [`src/lib/**/*.test.ts`](src/lib/noesis.test.ts)                     | Policy, schema, approval-binding, and fail-closed cryptography cases                          |
+| Layer                     | Source                                                                     | What to look for                                                                              |
+| ------------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| Trust boundary            | [`src/lib/noesis-schema.ts`](src/lib/noesis-schema.ts)                     | Strict Zod objects, bounded sizes, versioned schema                                           |
+| Decision kernel           | [`src/lib/noesis.ts`](src/lib/noesis.ts)                                   | `evaluateWarrant`, `warrantPolicies`, `issueDryRunReceipt`                                    |
+| Content-bound approvals   | [`src/lib/noesis.ts`](src/lib/noesis.ts)                                   | `authorityFingerprint`, `reconcileApproval`, `stripImportedAuthority`                         |
+| Probability flow          | [`src/lib/probability-flow.ts`](src/lib/probability-flow.ts)               | `resolveProbabilityFlow`, `canonicalizeProbabilityFlowInput`, replay verification             |
+| Conformance vectors       | [`public/ipf-conformance-v0.1.0.json`](public/ipf-conformance-v0.1.0.json) | Portable accept and reject cases every runtime must pass                                      |
+| Revision-bound packets    | [`src/lib/exchange/model.ts`](src/lib/exchange/model.ts)                   | `packetApprovalValid`, `importWorkspace` (imports strip authority)                            |
+| Encrypted vault           | [`src/lib/exchange/vault.ts`](src/lib/exchange/vault.ts)                   | AES-256-GCM, PBKDF2-SHA256, authenticated format binding, input bounded before key derivation |
+| Machine-readable contract | [`public/tet-noesis-contract.yaml`](public/tet-noesis-contract.yaml)       | The policy as data: tiers, authority rules, execution limits                                  |
+| Agent operator package    | [`skills/govern-tet-noesis/`](skills/govern-tet-noesis/SKILL.md)           | A provider-neutral skill that applies the same warrant loop inside coding agents              |
+| Tests                     | [`src/lib/**/*.test.ts`](src/lib/noesis.test.ts)                           | Policy, schema, approval-binding, conformance, and fail-closed cryptography cases             |
 
 ## Reference applications
 
@@ -164,8 +185,10 @@ money and legal documents.
 
 **Noesis workbench (`/noesis`).** Author canonical state, evidence, and leases;
 run the kernel live; inspect every blocker; export the workspace and receipts
-as strictly validated JSON. Granting approval binds it to the current content;
-editing anything it vouches for revokes it and records why. Product boundary:
+as strictly validated JSON. A probability-flow panel lets you adjust risk
+inputs and resolve which effects are eligible. Granting approval binds it to
+the current content; editing anything it vouches for revokes it and records
+why. Product boundary:
 [`docs/product/TET_NOESIS.md`](docs/product/TET_NOESIS.md).
 
 **TrueNorth Exchange (`/exchange`).** A property acquisition workspace governed
@@ -204,9 +227,11 @@ product enforces.
 | Capability leases with expiry, budget, approval, auto-revoke   | Shipped |
 | Dry-run receipts and a bounded local audit trail               | Shipped |
 | Content-bound human approvals, enforced in the kernel          | Shipped |
+| Invariant Probability Flow reference with replayable receipts  | Shipped |
+| Portable conformance vectors for cross-runtime verification    | Shipped |
 | Encrypted local vault for Exchange workspaces                  | Shipped |
 | Provider-neutral agent skill and governor role                 | Shipped |
-| CI gate: format, 27 unit tests, lint, type-check, build        | Shipped |
+| CI gate: format, 67 unit tests, lint, type-check, build        | Shipped |
 
 **Next: the path to a production kernel**
 
@@ -236,9 +261,12 @@ These are stated plainly so that technical review starts from facts.
   server-authoritative system (roadmap step 3).
 - Receipts are structured records. They are not yet cryptographically signed
   (roadmap step 1).
+- Probability-flow risk weights, including every psychology-facing weight, are
+  unvalidated research scaffolding. The conformance vectors prove that
+  runtimes agree, not that the weights are right.
 - Approval fingerprints detect ordinary edits to protected content, subject to
-  hash collisions. Evidence observation timestamps are excluded; freshness is
-  not evaluated. These non-cryptographic hashes are not signatures, so they do
+  hash collisions. Evidence observation timestamps and the probability-flow
+  `forecastAsOf` stamp are excluded; freshness is not evaluated. These non-cryptographic hashes are not signatures, so they do
   not prove who approved or resist deliberate tampering (roadmap step 1).
 - Reactivating an unchanged lease can issue another dry-run receipt without
   fresh approval. Receipts do not confer single-use execution authority.

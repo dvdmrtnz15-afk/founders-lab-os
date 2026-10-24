@@ -22,9 +22,12 @@ disabled.
   approval, activation, and automatic revocation.
 - Human approval bound to a fingerprint of the content it vouches for: the
   workspace identity, tier, objective, canonical state, uncertainty, evidence
-  ledger, and lease scope, tools, budget, and expiry. Any change revokes the
-  approval in the workbench and blocks with `approval_stale` in the evaluator.
-  Evidence observation timestamps are excluded; freshness is not evaluated.
+  ledger, lease scope, tools, budget, and expiry, and the probability-flow
+  envelope (enabled flag, canonical inputs, and latest decision with its
+  authorized effects). Any change revokes the approval in the workbench and
+  blocks with `approval_stale` in the evaluator. Evidence observation
+  timestamps and the probability-flow `forecastAsOf` stamp are excluded;
+  freshness is not evaluated.
   Imported workspaces arrive with the lease inactive and approval cleared.
 - Proportional low, medium, high, and critical warrant policies.
 - A deterministic warrant decision: allow, verify, or block.
@@ -33,6 +36,10 @@ disabled.
 - An append-only local audit trail and downloadable dry-run receipts.
 - Vitest policy and schema regression tests enforced in CI.
 - Public contract download at `/tet-noesis-contract.yaml`.
+- An attachable Invariant Probability Flow envelope that resolves tail risk,
+  first-passage exposure, protected-boundary flux, identity liabilities,
+  observer freshness, witness reductions, and two-principal autonomy before the
+  Noesis warrant can issue a dry-run receipt.
 
 ## Deliberate non-goals
 
@@ -42,6 +49,18 @@ disabled.
   persistence.
 - No production actions or live self-modification.
 - No claim that coordination or self-modeling constitutes consciousness.
+- No fitted Fokker--Planck model, validated psychological coefficient, or claim
+  that the two 144-cardinality systems are semantically equivalent.
+
+## Invariant Probability Flow
+
+The local workbench includes protocol `0.1.0` as an operational research
+harness. It accepts calibrated probability summaries, authorizes a
+dependency-closed subset of candidate effects, transitively revokes stale
+observer dependents, and embeds the replayable flow receipt in the Noesis
+receipt. The equations, theorem targets, claim boundary, falsification surface,
+and Lyzt adoption plan are documented in
+[`INVARIANT_PROBABILITY_FLOW.md`](./INVARIANT_PROBABILITY_FLOW.md).
 
 ## Warrant policies
 

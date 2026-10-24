@@ -16,14 +16,17 @@ import {
   stripImportedAuthority,
   warrantPolicies,
 } from "@/lib/noesis";
+import { applyProbabilityFlowResolution } from "@/lib/probability-flow";
 import {
   parseNoesisWorkspace,
   type CapabilityLease,
   type EvidenceItem,
   type NoesisWorkspace,
 } from "@/lib/noesis-schema";
+import type { ProbabilityFlowProtocol } from "@/lib/probability-flow-schema";
 import { AuditTimeline } from "./components/audit-timeline";
 import { EvidenceLedger } from "./components/evidence-ledger";
+import { ProbabilityFlowPanel } from "./components/probability-flow-panel";
 import { WarrantPanel } from "./components/warrant-panel";
 import { WorkbenchHeader } from "./components/workbench-header";
 import { WorkspaceEditor } from "./components/workspace-editor";
@@ -236,6 +239,54 @@ export function NoesisWorkbench() {
     );
   }
 
+  function updateProbabilityFlow(probabilityFlow: ProbabilityFlowProtocol) {
+    setWorkspace((current) => {
+      const now = new Date().toISOString();
+      return reconcileApproval(
+        { ...current, probabilityFlow, updatedAt: now },
+        now,
+      );
+    });
+  }
+
+  function resolveProbabilityFlow() {
+    try {
+      const now = new Date().toISOString();
+      const probabilityFlow = applyProbabilityFlowResolution(
+        workspace.probabilityFlow,
+        now,
+      );
+      setWorkspace((current) =>
+        // A new resolution can change the authorized effects an approval
+        // vouched for, so reconcile after recording it.
+        reconcileApproval(
+          appendAudit(
+            { ...current, probabilityFlow },
+            {
+              kind: "probability_flow_resolved",
+              message: `${probabilityFlow.receipts[0]?.receiptId} resolved; only receipted effects are eligible for the Noesis warrant.`,
+            },
+            now,
+          ),
+          now,
+        ),
+      );
+      setNotice({
+        tone: "success",
+        message:
+          "Probability flow resolved and receipted. Re-run after any input changes.",
+      });
+    } catch (error) {
+      setNotice({
+        tone: "error",
+        message:
+          error instanceof Error
+            ? `Probability flow rejected: ${error.message}`
+            : "Probability flow could not be resolved.",
+      });
+    }
+  }
+
   function issueReceipt() {
     try {
       setWorkspace((current) => issueDryRunReceipt(current));
@@ -356,9 +407,9 @@ export function NoesisWorkbench() {
                 One run. One proof line. One decision.
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-[#5e6b63]">
-                Define the objective, attach falsifiable evidence, scope the
-                lease, and record a portable receipt. Nothing leaves this
-                browser.
+                Define the objective, attach falsifiable evidence, forecast
+                protected-boundary risk, scope the lease, and record a portable
+                receipt. Nothing leaves this browser.
               </p>
             </div>
             <nav
@@ -368,10 +419,11 @@ export function NoesisWorkbench() {
               {[
                 ["01", "Define", "#definition"],
                 ["02", "Evidence", "#evidence"],
-                ["03", "Audit", "#audit"],
+                ["03", "Flow", "#probability-flow"],
+                ["04", "Audit", "#audit"],
               ].map(([number, label, href]) => (
                 <a
-                  className="flex min-w-max items-center gap-2 px-3 py-2 text-xs font-semibold text-[#38473e] transition hover:bg-white hover:text-[#0d6a42]"
+                  className="flex min-h-11 min-w-max items-center gap-2 px-3 py-2 text-xs font-semibold text-[#38473e] transition hover:bg-white hover:text-[#0d6a42]"
                   href={href}
                   key={href}
                 >
@@ -393,7 +445,7 @@ export function NoesisWorkbench() {
             <p>{notice.message}</p>
             <button
               aria-label="Dismiss message"
-              className="font-mono text-xs opacity-60 hover:opacity-100"
+              className="min-h-11 px-2 font-mono text-xs opacity-60 hover:opacity-100"
               onClick={() => setNotice(null)}
               type="button"
             >
@@ -414,6 +466,11 @@ export function NoesisWorkbench() {
               onAdd={addEvidence}
               onChange={updateEvidence}
               onRemove={removeEvidence}
+            />
+            <ProbabilityFlowPanel
+              flow={workspace.probabilityFlow}
+              onChange={updateProbabilityFlow}
+              onResolve={resolveProbabilityFlow}
             />
             <AuditTimeline workspace={workspace} />
           </div>
