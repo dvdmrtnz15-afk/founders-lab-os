@@ -9,9 +9,11 @@ import {
 } from "./noesis-schema";
 import {
   applyProbabilityFlowResolution,
+  canonicalizeProbabilityFlowInput,
   createInitialProbabilityFlowProtocol,
   verifyProbabilityFlowReplay,
 } from "./probability-flow";
+import type { ProbabilityFlowProtocol } from "./probability-flow-schema";
 
 export type WarrantDecision = "allowed" | "verify" | "blocked";
 
@@ -230,14 +232,45 @@ function fnv1a64(input: string): string {
 }
 
 /**
+ * The probability-flow facts an approval vouches for: whether the envelope is
+ * enabled, its canonical inputs (receipt history excluded), and the latest
+ * resolved decision with its authorized effects. Never throws: an input that
+ * cannot be canonicalized yields a distinct marker, so a draft edit still
+ * changes the fingerprint and fails closed.
+ */
+function probabilityFlowAuthorityFacts(flow: ProbabilityFlowProtocol) {
+  let input: string;
+  try {
+    // Re-resolving restamps forecastAsOf without changing any risk input, so
+    // it is excluded, like evidence observation times. The latest decision and
+    // authorized effects below still bind what a re-resolution produced.
+    const canonical = JSON.parse(canonicalizeProbabilityFlowInput(flow));
+    delete canonical.forecastAsOf;
+    input = JSON.stringify(canonical);
+  } catch {
+    input = `uncanonicalizable:${JSON.stringify({ ...flow, receipts: [] })}`;
+  }
+  const latest = flow.receipts[0];
+
+  return [
+    flow.enabled,
+    input,
+    latest ? [latest.decision, [...latest.authorizedEffectIds].sort()] : null,
+  ];
+}
+
+/**
  * Deterministic fingerprint of everything a human approval vouches for: the
  * workspace identity, warrant tier, objective, canonical state, uncertainty,
- * evidence ledger, and lease scope, tools, budget, and expiry.
+ * evidence ledger, lease scope, tools, budget, and expiry, and the
+ * probability-flow envelope (enabled flag, canonical inputs, and latest
+ * decision with its authorized effects).
  *
  * Presentation fields, audit history, receipts, and the lease's activation and
  * approval flags are excluded, so activating an approved lease does not void
- * the approval. Evidence observation timestamps are also excluded; the local
- * evaluator does not assess freshness. This detects ordinary protected-content
+ * the approval. Evidence observation timestamps and the probability-flow
+ * forecastAsOf stamp are also excluded; the local evaluator does not assess
+ * freshness. This detects ordinary protected-content
  * edits, subject to hash collisions. It is not a
  * cryptographic signature and does not protect against deliberate tampering.
  */
@@ -253,7 +286,7 @@ export function authorityFingerprint(workspace: NoesisWorkspace): string {
       item.independent,
     ]);
   const payload = JSON.stringify([
-    "noesis-authority-v1",
+    "noesis-authority-v2",
     workspace.workspaceId,
     workspace.warrantLevel,
     workspace.objective,
@@ -266,6 +299,7 @@ export function authorityFingerprint(workspace: NoesisWorkspace): string {
       workspace.lease.budget,
       workspace.lease.expiresAt,
     ],
+    probabilityFlowAuthorityFacts(workspace.probabilityFlow),
   ]);
 
   return `fnv1a64:${fnv1a64(payload)}`;
@@ -506,10 +540,17 @@ export function evaluateWarrant(
   }
 
   if (workspace.probabilityFlow.enabled && latestProbabilityFlowReceipt) {
-    const replay = verifyProbabilityFlowReplay(
-      workspace.probabilityFlow,
-      latestProbabilityFlowReceipt,
-    );
+    let replay: { ok: boolean };
+    try {
+      replay = verifyProbabilityFlowReplay(
+        workspace.probabilityFlow,
+        latestProbabilityFlowReceipt,
+      );
+    } catch {
+      // Inputs that no longer satisfy the protocol schema cannot replay.
+      // Fail closed with a blocker instead of throwing from the evaluator.
+      replay = { ok: false };
+    }
 
     if (!replay.ok) {
       blockers.push({

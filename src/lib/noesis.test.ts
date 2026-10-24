@@ -260,6 +260,63 @@ describe("approval binding", () => {
   });
 });
 
+describe("approval binding covers probability flow", () => {
+  it("voids approval when probability flow is switched off", () => {
+    const approved = approvedHighRiskWorkspace();
+    const disabled = {
+      ...approved,
+      probabilityFlow: { ...approved.probabilityFlow, enabled: false },
+    };
+
+    expect(evaluateWarrant(disabled, now).decision).toBe("blocked");
+    expect(blockerCodes(disabled)).toContain("approval_stale");
+  });
+
+  it("voids approval when re-resolved inputs change the authorized effects", () => {
+    const approved = approvedHighRiskWorkspace();
+    const flow = structuredClone(approved.probabilityFlow);
+    flow.actions = flow.actions.map((action) => ({
+      ...action,
+      authorized: false,
+    }));
+    const reResolved = {
+      ...approved,
+      probabilityFlow: applyProbabilityFlowResolution(flow, now),
+    };
+
+    expect(blockerCodes(reResolved)).toContain("approval_stale");
+    expect(blockerCodes(reResolved)).not.toContain("probability_flow_stale");
+  });
+
+  it("keeps approval through an identical re-resolution", () => {
+    const approved = approvedHighRiskWorkspace();
+    const reResolved = {
+      ...approved,
+      probabilityFlow: applyProbabilityFlowResolution(
+        approved.probabilityFlow,
+        now,
+      ),
+    };
+
+    expect(reResolved.probabilityFlow.receipts[0]?.receiptId).not.toBe(
+      approved.probabilityFlow.receipts[0]?.receiptId,
+    );
+    expect(blockerCodes(reResolved)).not.toContain("approval_stale");
+  });
+
+  it("fails closed without throwing on an invalid probability-flow draft", () => {
+    const approved = approvedHighRiskWorkspace();
+    const draft = structuredClone(approved);
+    draft.probabilityFlow.actions[0].dependencyNodeIds = ["missing-node"];
+
+    expect(() => authorityFingerprint(draft)).not.toThrow();
+    expect(authorityFingerprint(draft)).not.toBe(
+      authorityFingerprint(approved),
+    );
+    expect(evaluateWarrant(draft, now).decision).toBe("blocked");
+  });
+});
+
 describe("workspace contracts", () => {
   it("round-trips a valid workspace", () => {
     const result = deserializeWorkspace(

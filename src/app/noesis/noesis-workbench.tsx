@@ -240,11 +240,13 @@ export function NoesisWorkbench() {
   }
 
   function updateProbabilityFlow(probabilityFlow: ProbabilityFlowProtocol) {
-    setWorkspace((current) => ({
-      ...current,
-      probabilityFlow,
-      updatedAt: new Date().toISOString(),
-    }));
+    setWorkspace((current) => {
+      const now = new Date().toISOString();
+      return reconcileApproval(
+        { ...current, probabilityFlow, updatedAt: now },
+        now,
+      );
+    });
   }
 
   function resolveProbabilityFlow() {
@@ -255,12 +257,17 @@ export function NoesisWorkbench() {
         now,
       );
       setWorkspace((current) =>
-        appendAudit(
-          { ...current, probabilityFlow },
-          {
-            kind: "probability_flow_resolved",
-            message: `${probabilityFlow.receipts[0]?.receiptId} resolved; only receipted effects are eligible for the Noesis warrant.`,
-          },
+        // A new resolution can change the authorized effects an approval
+        // vouched for, so reconcile after recording it.
+        reconcileApproval(
+          appendAudit(
+            { ...current, probabilityFlow },
+            {
+              kind: "probability_flow_resolved",
+              message: `${probabilityFlow.receipts[0]?.receiptId} resolved; only receipted effects are eligible for the Noesis warrant.`,
+            },
+            now,
+          ),
           now,
         ),
       );
