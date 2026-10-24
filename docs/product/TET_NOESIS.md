@@ -22,9 +22,12 @@ disabled.
   approval, activation, and automatic revocation.
 - Human approval bound to a fingerprint of the content it vouches for: the
   workspace identity, tier, objective, canonical state, uncertainty, evidence
-  ledger, and lease scope, tools, budget, and expiry. Any change revokes the
-  approval in the workbench and blocks with `approval_stale` in the evaluator.
-  Evidence observation timestamps are excluded; freshness is not evaluated.
+  ledger, lease scope, tools, budget, and expiry, and the probability-flow
+  envelope (enabled flag, canonical inputs, and latest decision with its
+  authorized effects). Any change revokes the approval in the workbench and
+  blocks with `approval_stale` in the evaluator. Evidence observation
+  timestamps and the probability-flow `forecastAsOf` stamp are excluded;
+  freshness is not evaluated.
   Imported workspaces arrive with the lease inactive and approval cleared.
 - Proportional low, medium, high, and critical warrant policies.
 - A deterministic warrant decision: allow, verify, or block.

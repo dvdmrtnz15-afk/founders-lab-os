@@ -1,7 +1,8 @@
 # Invariant Probability Flow — Lyzt interoperability contract
 
-Status: local contract implemented; Lyzt adoption pending an exclusive editor
-lease and independent review.
+Status: local contract implemented; portable conformance vectors published;
+Lyzt adoption pending an exclusive editor lease, a passing conformance run, and
+independent review.
 
 ## Ownership boundary
 
@@ -87,8 +88,32 @@ hash with the existing governance key, and the verifier must independently
 recompute the projection and verify the signature. No new signer or parallel
 receipt ledger is allowed.
 
+## Conformance vectors
+
+[`public/ipf-conformance-v0.1.0.json`](../../public/ipf-conformance-v0.1.0.json)
+is the executable specification for protocol `0.1.0`. Each vector carries a
+complete protocol input and its expected outcome. Accept vectors fix the
+canonical-input SHA-256, the decision, the authorized effects, and the blocked
+effects with their blocker codes. Reject vectors must fail schema validation
+and are never resolved.
+
+Matching only the demo-vector hash is not conformance. An implementation can
+reproduce that hash while accepting inputs the reference rejects, so a runtime
+claims this protocol version only when every vector passes. Blocker codes are
+compared exactly because Lyzt verifies a bundle by replaying its receipt: a
+runtime that explains a block differently cannot replay a reference receipt.
+
+The reference runs the file in CI
+(`src/lib/probability-flow.conformance.test.ts`). Lyzt must load the same file,
+unmodified, in its own test suite. The vectors change only deliberately,
+alongside a protocol change, and are never regenerated from an implementation.
+
+**Gate:** adoption step 4 below (wiring the readout into prepare/commit) must
+not begin until the Lyzt runtime passes every vector.
+
 ## Required conformance tests
 
+- every vector in `public/ipf-conformance-v0.1.0.json` passes;
 - identical inputs with different object insertion order canonicalize equally;
 - changing any risk, boundary, observer, principal, witness, memory-fact, or
   action value changes the SHA-256 input commitment;
@@ -113,8 +138,9 @@ receipt ledger is allowed.
 2. Land the pure verifier and export it through the canonical kernel API.
 3. Add the two probability-flow commitments to the existing receipt-v2 signed
    projection, then prove hash derivation and Ed25519 verification end to end.
-4. Wire the verified readout into the active prepare/commit chokepoint behind a
-   default-off flag; do not create a parallel authority plane. Each transition
+4. After the Lyzt runtime passes every conformance vector, wire the verified
+   readout into the active prepare/commit chokepoint behind a default-off flag;
+   do not create a parallel authority plane. Each transition
    packet action must be one of the selected authorized effects; its packet
    input hash and judgment-bound lease then bind the flow proof to commit.
 5. Shadow-replay local proof bundles and compare deterministic receipts.

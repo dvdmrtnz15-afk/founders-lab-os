@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Landed the Invariant Probability Flow reference harness on `main` (from the
+  unmerged `feat/auth-foundation` branch, without its dormant Auth.js commit or
+  its Next.js upgrade).
+- Added portable conformance vectors at `public/ipf-conformance-v0.1.0.json`:
+  four accept vectors with exact expected outcomes and five reject vectors for
+  referential-integrity rules. The reference runs them in CI, and they gate
+  Lyzt's prepare/commit adoption.
+- Extended content-bound approval to the probability-flow envelope
+  (`noesis-authority-v2`). Disabling the flow or re-resolving it with a
+  different outcome now revokes approval. Approvals saved earlier must be
+  granted again.
+- `evaluateWarrant` now blocks instead of throwing when probability-flow inputs
+  fail the protocol schema.
 - Bound Noesis human approval to the content it was granted for. The evaluator
   fingerprints the authorizing content and returns `approval_stale` (hard
   block) when it changes; the workbench revokes stale approvals with an audit

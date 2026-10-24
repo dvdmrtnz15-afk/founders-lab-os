@@ -43,6 +43,9 @@ execution:
 probability_flow:
   schema_version: "0.1.0"
   status: "operational_local_research_harness"
+  conformance_vectors: "/ipf-conformance-v0.1.0.json"
+  conformance_requires_every_vector: true
+  approval_fingerprint_includes_envelope: true
   domains:
     - identity
     - affect
