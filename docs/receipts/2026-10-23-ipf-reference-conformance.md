@@ -7,7 +7,7 @@
 - Risk tier: CODE (multi-file feature, authorization-binding change). No
   dependency change, no backend, no migration. Push and pull request approved by
   the repository owner.
-- Baseline: `ff4a04410d4c6d9fd8d63a00a6b6ad32a2d6a27c` (`main` after PR #10).
+- Baseline: `ff4a0440d617462fdf2980b6c6056da565d253eb` (`main` after PR #10).
 
 ## Finding that motivated this change
 
