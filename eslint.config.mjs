@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Vendored third-party skill; kept as upstream ships it.
+    ".claude/skills/anatomy/**",
   ]),
 ]);
 
