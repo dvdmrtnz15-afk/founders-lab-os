@@ -16,3 +16,7 @@ Owns product intent before implementation.
 - Acceptance criteria.
 - UI/admin/API surface.
 - Non-goals.
+
+## Persona Spec
+
+`role:product` in `src/lib/persona/registry.ts`.

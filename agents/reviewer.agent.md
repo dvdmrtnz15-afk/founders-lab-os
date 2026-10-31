@@ -16,3 +16,7 @@ Reviews for correctness, maintainability, security, and test gaps.
 - Open questions.
 - Residual risks.
 - Verdict.
+
+## Persona Spec
+
+`role:reviewer` in `src/lib/persona/registry.ts`.

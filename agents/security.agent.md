@@ -15,3 +15,7 @@ Owns auth, RBAC, secrets, abuse paths, and secure-by-design review.
 - RBAC impact.
 - Threat model delta.
 - Required elevated review.
+
+## Persona Spec
+
+`role:security` in `src/lib/persona/registry.ts`.

@@ -14,11 +14,24 @@ import {
   verifyProbabilityFlowReplay,
 } from "./probability-flow";
 import type { ProbabilityFlowProtocol } from "./probability-flow-schema";
+import { fnv1a64, stableStringify } from "./hash";
+import { aggregateCouncil } from "./persona/council";
+import {
+  evaluatePersonaAuthority,
+  personaFingerprint,
+  type PersonaBlockerCode,
+} from "./persona/persona";
+import { parsePersonaSpec } from "./persona/persona-schema";
+import { warrantRank } from "./warrant-level";
 
 export type WarrantDecision = "allowed" | "verify" | "blocked";
 
 export type WarrantBlocker = {
   code:
+    | PersonaBlockerCode
+    | "council_invalid"
+    | "council_veto"
+    | "council_hold"
     | "approval_missing"
     | "approval_stale"
     | "workspace_title_missing"
@@ -218,17 +231,29 @@ export function appendAudit(
   };
 }
 
-const FNV_OFFSET_64 = BigInt("0xcbf29ce484222325");
-const FNV_PRIME_64 = BigInt("0x100000001b3");
-const MASK_64 = BigInt("0xffffffffffffffff");
-
-function fnv1a64(input: string): string {
-  let hash = FNV_OFFSET_64;
-  for (const byte of new TextEncoder().encode(input)) {
-    hash ^= BigInt(byte);
-    hash = (hash * FNV_PRIME_64) & MASK_64;
+/**
+ * Persona and council facts an approval vouches for. Returns null when the
+ * workspace carries neither, so pre-persona fingerprints are unchanged.
+ * Never throws: an invalid persona hashes its raw content and fails closed.
+ */
+function personaAuthorityFacts(workspace: NoesisWorkspace) {
+  if (workspace.persona === undefined && workspace.council === undefined) {
+    return null;
   }
-  return hash.toString(16).padStart(16, "0");
+
+  let persona: string | null = null;
+  if (workspace.persona !== undefined) {
+    const parsed = parsePersonaSpec(workspace.persona);
+    persona = parsed.success
+      ? personaFingerprint(parsed.data)
+      : `invalid:${fnv1a64(stableStringify(workspace.persona))}`;
+  }
+
+  const council = [...(workspace.council ?? [])]
+    .map((vote) => stableStringify(vote))
+    .sort();
+
+  return ["persona-v1", persona, council];
 }
 
 /**
@@ -285,7 +310,7 @@ export function authorityFingerprint(workspace: NoesisWorkspace): string {
       item.weight,
       item.independent,
     ]);
-  const payload = JSON.stringify([
+  const facts: unknown[] = [
     "noesis-authority-v2",
     workspace.workspaceId,
     workspace.warrantLevel,
@@ -300,7 +325,12 @@ export function authorityFingerprint(workspace: NoesisWorkspace): string {
       workspace.lease.expiresAt,
     ],
     probabilityFlowAuthorityFacts(workspace.probabilityFlow),
-  ]);
+  ];
+  // Appended only when present, so a workspace without a persona or council
+  // keeps exactly the fingerprint it had before personas existed.
+  const personaFacts = personaAuthorityFacts(workspace);
+  if (personaFacts) facts.push(personaFacts);
+  const payload = JSON.stringify(facts);
 
   return `fnv1a64:${fnv1a64(payload)}`;
 }
@@ -569,6 +599,48 @@ export function evaluateWarrant(
     }
   }
 
+  if (workspace.persona !== undefined) {
+    const approvalBound =
+      workspace.lease.approvalGranted &&
+      workspace.lease.approvalFingerprint === authorityFingerprint(workspace);
+    blockers.push(
+      ...evaluatePersonaAuthority(workspace.persona, {
+        warrantLevel: workspace.warrantLevel,
+        tools: workspace.lease.tools,
+        approvalBound,
+      }),
+    );
+  }
+
+  if (workspace.council !== undefined && workspace.council.length > 0) {
+    const actingRef = parsePersonaSpec(workspace.persona);
+    const council = aggregateCouncil(
+      workspace.council,
+      actingRef.success ? actingRef.data.ref : null,
+    );
+    // A unanimous council yields "no_objection" and adds nothing: consensus
+    // is not proof. It can only stop or hold the warrant.
+    if (council.outcome === "invalid") {
+      blockers.push({
+        code: "council_invalid",
+        message: `Review council cannot be counted: ${council.problems.join(" ")}`,
+        hard: true,
+      });
+    } else if (council.outcome === "veto") {
+      blockers.push({
+        code: "council_veto",
+        message: `Hard veto from ${council.vetoedBy.join(", ")}.`,
+        hard: true,
+      });
+    } else if (council.outcome === "hold") {
+      blockers.push({
+        code: "council_hold",
+        message: `Resolve review objections from ${council.heldBy.join(", ")}.`,
+        hard: false,
+      });
+    }
+  }
+
   if (!workspaceValidation.success) {
     blockers.push({
       code: "workspace_invalid",
@@ -590,6 +662,34 @@ export function evaluateWarrant(
     independentVerification,
     verifiedCount: verifiedEvidence.length,
     evidenceCount: workspace.evidence.length,
+  };
+}
+
+/**
+ * Whether this workspace needs a bound human approval: either its warrant
+ * policy requires one, or the acting persona escalates at this tier.
+ */
+export function requiresHumanApproval(workspace: NoesisWorkspace): boolean {
+  if (warrantPolicies[workspace.warrantLevel].requiresHumanApproval) {
+    return true;
+  }
+  const parsed = parsePersonaSpec(workspace.persona);
+  return (
+    parsed.success &&
+    parsed.data.escalateAtOrAbove !== null &&
+    warrantRank(workspace.warrantLevel) >=
+      warrantRank(parsed.data.escalateAtOrAbove)
+  );
+}
+
+function actingPersonaReceiptFields(
+  workspace: NoesisWorkspace,
+): Pick<NoesisReceipt, "personaRef" | "personaFingerprint"> {
+  const parsed = parsePersonaSpec(workspace.persona);
+  if (!parsed.success) return {};
+  return {
+    personaRef: parsed.data.ref,
+    personaFingerprint: personaFingerprint(parsed.data),
   };
 }
 
@@ -626,6 +726,7 @@ export function issueDryRunReceipt(
     probabilityFlowReceipt: workspace.probabilityFlow.enabled
       ? workspace.probabilityFlow.receipts[0]
       : undefined,
+    ...actingPersonaReceiptFields(workspace),
     residualRisk:
       options.residualRisk ??
       "External execution remains disabled; this receipt records a local dry run only.",

@@ -15,3 +15,7 @@ Owns verification.
 - Tests run.
 - Manual QA performed.
 - Known gaps.
+
+## Persona Spec
+
+`role:qa` in `src/lib/persona/registry.ts`.

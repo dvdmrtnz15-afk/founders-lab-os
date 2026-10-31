@@ -91,3 +91,7 @@ Residual risk:
 For `HOLD`, name the smallest verification step that could unlock the task. For
 `DENY`, name the evidence, policy, or authority boundary that blocks it. For
 `ALLOW`, expire the lease after the verified bounded action.
+
+## Persona Spec
+
+`role:noesis-governor` in `src/lib/persona/registry.ts`.

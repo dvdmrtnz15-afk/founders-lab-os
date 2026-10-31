@@ -15,3 +15,7 @@ Owns server behavior, APIs, jobs, and integrations.
 - Input/output contract.
 - Error behavior.
 - Test coverage.
+
+## Persona Spec
+
+`role:backend` in `src/lib/persona/registry.ts`.

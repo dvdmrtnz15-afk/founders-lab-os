@@ -15,3 +15,7 @@ Owns visible product surfaces.
 - Responsive behavior.
 - Preview evidence.
 - Accessibility notes.
+
+## Persona Spec
+
+`role:frontend` in `src/lib/persona/registry.ts`.

@@ -15,3 +15,7 @@ Reads the repo before any coding.
 - Existing pattern summary.
 - Affected-file list.
 - Risk map.
+
+## Persona Spec
+
+`role:repo-cartographer` in `src/lib/persona/registry.ts`.

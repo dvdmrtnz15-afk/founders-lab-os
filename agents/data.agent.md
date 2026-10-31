@@ -14,3 +14,7 @@ Owns schema, migrations, indexes, retention, and backup/restore.
 - Migration plan.
 - Rollback plan.
 - Retention and backup impact.
+
+## Persona Spec
+
+`role:data` in `src/lib/persona/registry.ts`.
