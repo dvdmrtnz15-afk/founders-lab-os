@@ -222,21 +222,22 @@ product enforces.
 
 **Shipped**
 
-| Capability                                                      | Status  |
-| --------------------------------------------------------------- | ------- |
-| Deterministic warrant kernel with four policy tiers             | Shipped |
-| Strict, versioned schemas for workspaces, leases, and receipts  | Shipped |
-| Capability leases with expiry, budget, approval, auto-revoke    | Shipped |
-| Dry-run receipts and a bounded local audit trail                | Shipped |
-| Content-bound human approvals, enforced in the kernel           | Shipped |
-| Invariant Probability Flow reference with replayable receipts   | Shipped |
-| Portable conformance vectors for cross-runtime verification     | Shipped |
-| Encrypted local vault for Exchange workspaces                   | Shipped |
-| Provider-neutral agent skill and governor role                  | Shipped |
-| Typed personas with attenuation, review council, voice lint     | Shipped |
-| Warranted executor: preflight, verify, rollback, signed receipt | Shipped |
-| Ed25519 signed envelopes for personas and execution receipts    | Shipped |
-| CI gate: format, 143 unit tests, lint, type-check, build        | Shipped |
+| Capability                                                       | Status  |
+| ---------------------------------------------------------------- | ------- |
+| Deterministic warrant kernel with four policy tiers              | Shipped |
+| Strict, versioned schemas for workspaces, leases, and receipts   | Shipped |
+| Capability leases with expiry, budget, approval, auto-revoke     | Shipped |
+| Dry-run receipts and a bounded local audit trail                 | Shipped |
+| Content-bound human approvals, enforced in the kernel            | Shipped |
+| Invariant Probability Flow reference with replayable receipts    | Shipped |
+| Portable conformance vectors for cross-runtime verification      | Shipped |
+| Encrypted local vault for Exchange workspaces                    | Shipped |
+| Provider-neutral agent skill and governor role                   | Shipped |
+| Typed personas with attenuation, review council, voice lint      | Shipped |
+| Warranted executor: preflight, verify, rollback, signed receipt  | Shipped |
+| Ed25519 signed envelopes for personas and execution receipts     | Shipped |
+| Expert Desk: explainable task routing to governed Claude experts | Shipped |
+| CI gate: format, 171 unit tests, lint, type-check, build         | Shipped |
 
 **Next: the path to a production kernel**
 
