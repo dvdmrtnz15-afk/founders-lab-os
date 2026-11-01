@@ -52,6 +52,8 @@ export const auditEventSchema = z.strictObject({
     "receipt_issued",
     "persona_changed",
     "council_updated",
+    "execution_completed",
+    "execution_refused",
   ]),
   message: z.string().min(3).max(300),
 });
