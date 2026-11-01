@@ -17,8 +17,10 @@ the lease that authorized it is revoked.
 
 > **Status: v0.x kernel preview.** The decision kernel, strict schemas,
 > capability leases, receipts, and two reference applications are shipped and
-> covered by tests in CI. Execution is dry-run only by design: no model calls,
-> no external effects, no server. See
+> covered by tests in CI. The browser workbench is dry-run only: no model
+> calls, no external effects, no server. A library executor
+> (`src/lib/executor/`) can run host-supplied tool adapters behind an `ALLOW`
+> and return Ed25519-signed receipts; a host process must call it. See
 > [What's shipped and what's next](#whats-shipped-and-whats-next).
 
 ## The problem
@@ -220,18 +222,21 @@ product enforces.
 
 **Shipped**
 
-| Capability                                                     | Status  |
-| -------------------------------------------------------------- | ------- |
-| Deterministic warrant kernel with four policy tiers            | Shipped |
-| Strict, versioned schemas for workspaces, leases, and receipts | Shipped |
-| Capability leases with expiry, budget, approval, auto-revoke   | Shipped |
-| Dry-run receipts and a bounded local audit trail               | Shipped |
-| Content-bound human approvals, enforced in the kernel          | Shipped |
-| Invariant Probability Flow reference with replayable receipts  | Shipped |
-| Portable conformance vectors for cross-runtime verification    | Shipped |
-| Encrypted local vault for Exchange workspaces                  | Shipped |
-| Provider-neutral agent skill and governor role                 | Shipped |
-| CI gate: format, 67 unit tests, lint, type-check, build        | Shipped |
+| Capability                                                      | Status  |
+| --------------------------------------------------------------- | ------- |
+| Deterministic warrant kernel with four policy tiers             | Shipped |
+| Strict, versioned schemas for workspaces, leases, and receipts  | Shipped |
+| Capability leases with expiry, budget, approval, auto-revoke    | Shipped |
+| Dry-run receipts and a bounded local audit trail                | Shipped |
+| Content-bound human approvals, enforced in the kernel           | Shipped |
+| Invariant Probability Flow reference with replayable receipts   | Shipped |
+| Portable conformance vectors for cross-runtime verification     | Shipped |
+| Encrypted local vault for Exchange workspaces                   | Shipped |
+| Provider-neutral agent skill and governor role                  | Shipped |
+| Typed personas with attenuation, review council, voice lint     | Shipped |
+| Warranted executor: preflight, verify, rollback, signed receipt | Shipped |
+| Ed25519 signed envelopes for personas and execution receipts    | Shipped |
+| CI gate: format, 143 unit tests, lint, type-check, build        | Shipped |
 
 **Next: the path to a production kernel**
 
@@ -259,8 +264,13 @@ These are stated plainly so that technical review starts from facts.
 - State lives in the browser. A local approval is not a security boundary
   against someone who controls that browser. Real effects require a
   server-authoritative system (roadmap step 3).
-- Receipts are structured records. They are not yet cryptographically signed
+- Workbench dry-run receipts are not signed. Executor receipts and personas
+  can be Ed25519-signed, but key storage, rotation, and a shared trust
+  registry are not built yet; the host supplies keys and trusted key ids
   (roadmap step 1).
+- The executor runs in whatever process calls it. It is not a sandbox: an
+  adapter has the host's privileges, so adapters must be reviewed like any
+  privileged code (roadmap steps 3 and 4).
 - Probability-flow risk weights, including every psychology-facing weight, are
   unvalidated research scaffolding. The conformance vectors prove that
   runtimes agree, not that the weights are right.

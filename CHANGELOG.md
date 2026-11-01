@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Added the warranted executor (`src/lib/executor/`, `docs/product/EXECUTION.md`):
+  after an `ALLOW`, it preflights every planned step (lease, persona,
+  adapter, step cap, stop signal, optional signed-persona trust) before
+  running any, then executes, verifies, lints persona output, compensates
+  newest-first on failure, revokes the lease, and returns an Ed25519-signed
+  receipt for every call, including refusals. Ships a no-shell, fixed-argv,
+  minimal-env Node command adapter.
+- Added Ed25519 signed envelopes over canonical JSON (`src/lib/signing.ts`)
+  using WebCrypto only: non-extractable keys, trusted-key-id allowlists, and
+  purpose separation.
 - Added the persona substrate (`src/lib/persona/`, `docs/product/PERSONAS.md`):
   strict persona specs with trait axes, voice rules, a governing law, a risk
   ceiling, tool allow and block lists, and parent attenuation, adapted from
