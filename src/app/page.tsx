@@ -17,19 +17,28 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-[#e7ece7] text-[#101713]">
       <header className="border-b border-[#bdc8c0] px-4 py-3 md:px-6">
-        <div className="mx-auto flex max-w-[1460px] items-center justify-between gap-4">
+        <div className="mx-auto flex max-w-[1460px] flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <div className="flex items-center gap-3">
             <span className="grid h-8 w-8 place-items-center bg-[#102019] font-mono text-[0.68rem] font-bold text-[#a9f1c6]">
               FL
             </span>
             <div>
               <p className="text-sm font-semibold">FounderLab OS</p>
-              <p className="font-mono text-[0.6rem] text-[#607067]">
+              <p className="hidden font-mono text-[0.6rem] text-[#607067] sm:block">
                 governed agent infrastructure
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <nav
+            aria-label="Primary"
+            className="flex flex-wrap items-center gap-1 sm:gap-3"
+          >
+            <Link
+              className="px-3 py-2 text-sm font-semibold text-[#176c48]"
+              href="/experts"
+            >
+              Expert Desk
+            </Link>
             <Link
               className="px-3 py-2 text-sm font-semibold text-[#176c48]"
               href="/exchange"
@@ -42,7 +51,7 @@ export default function Home() {
             >
               Open harness
             </Link>
-          </div>
+          </nav>
         </div>
       </header>
 

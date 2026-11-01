@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- Added the Expert Desk (`/experts`, `src/lib/experts/`,
+  `docs/product/EXPERTS.md`). Twelve experts, each a task contract on a
+  governed persona: routing signals, a method, a deliverable schema, a review
+  rubric, a default effort, and an independent reviewer on a different
+  persona. An explainable, deterministic router picks the expert, raises
+  effort and warrant tier for risky or complex tasks, flags work above the
+  persona's ceiling, and asks a clarifying question instead of guessing.
+  Briefs compile for Claude Opus 5.5 with a structured-output schema;
+  replies are verified against the contract and persona voice, and a
+  reviewer's verdict converts into a council vote the kernel enforces. The
+  home header now wraps on phones so every link stays visible.
 - Added the warranted executor (`src/lib/executor/`, `docs/product/EXECUTION.md`):
   after an `ALLOW`, it preflights every planned step (lease, persona,
   adapter, step cap, stop signal, optional signed-persona trust) before
