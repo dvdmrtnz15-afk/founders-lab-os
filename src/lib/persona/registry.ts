@@ -37,6 +37,7 @@ export const TOOLS = {
   generateReading: "generate reading",
   addRitualContext: "add ritual context",
   addLoreEntry: "add lore entry",
+  consultExpert: "consult expert",
 } as const;
 
 const CONSTITUTION_FORBIDDEN = [
@@ -294,6 +295,7 @@ export const ROLE_PERSONAS: readonly PersonaSpec[] = [
       TOOLS.searchCode,
       TOOLS.runChecks,
       TOOLS.openLocalhost,
+      TOOLS.consultExpert,
     ],
   }),
 ];

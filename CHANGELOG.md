@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Added live expert consultations (`src/lib/experts/node/claude-expert.ts`)
+  using the official `@anthropic-ai/sdk` (new dependency, owner-approved):
+  Claude Opus 5.5 with routed effort, structured output constrained to the
+  expert's deliverable, server-side refusal fallback, refusal and truncation
+  handling, contract verification, and an independent review that becomes a
+  council vote. The `consult expert` executor adapter runs consultations
+  under a lease with a signed receipt; `role:noesis-governor` may hold it.
 - Added the Expert Desk (`/experts`, `src/lib/experts/`,
   `docs/product/EXPERTS.md`). Twelve experts, each a task contract on a
   governed persona: routing signals, a method, a deliverable schema, a review

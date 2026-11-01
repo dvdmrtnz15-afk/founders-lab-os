@@ -237,7 +237,8 @@ product enforces.
 | Warranted executor: preflight, verify, rollback, signed receipt  | Shipped |
 | Ed25519 signed envelopes for personas and execution receipts     | Shipped |
 | Expert Desk: explainable task routing to governed Claude experts | Shipped |
-| CI gate: format, 171 unit tests, lint, type-check, build         | Shipped |
+| Live expert consultations with independent review (server-side)  | Shipped |
+| CI gate: format, 180 unit tests, lint, type-check, build         | Shipped |
 
 **Next: the path to a production kernel**
 

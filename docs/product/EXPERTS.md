@@ -63,10 +63,34 @@ Technical Writer, Repo Cartographer, and SpellShimmer Oracle Guide. Each rides
 a persona from the registry; `experts.test.ts` checks every persona and
 reviewer exists and that no reviewer shares its author's persona.
 
+## Live Claude calls
+
+`src/lib/experts/node/claude-expert.ts` (server-only) runs the loop for real
+with the official `@anthropic-ai/sdk`:
+
+- `runBrief` sends a compiled brief to Claude Opus 5.5 with the routed effort
+  and the deliverable as a structured-output JSON schema. It opts into
+  server-side refusal fallback (`fallbacks: "default"`, beta
+  `server-side-fallback-2026-07-01`), so a classifier decline retries on
+  Anthropic's recommended model for that category; the result reports which
+  model served it. It checks `stop_reason` first and never reads content from
+  a refusal or a truncated reply.
+- `consultExpert` routes the task, gets the answer, verifies it against the
+  contract, and only then asks the independent reviewer. The reviewer's
+  verdict becomes a council vote. An answer is accepted only when the
+  contract holds and the reviewer did not block.
+- `createExpertAdapter` exposes the loop as the `consult expert` lease tool,
+  so a consultation runs through the warranted executor: kernel `ALLOW`,
+  persona permission (granted to `role:noesis-governor`), single-use lease,
+  and an Ed25519-signed receipt.
+
+Credentials come from the environment the SDK reads (`ANTHROPIC_API_KEY`, or
+an `ant auth login` profile). Nothing in the repository reads `.env` files.
+
 ## Not yet built
 
-- The live Claude call. The desk compiles and displays the brief; sending it
-  requires a host adapter using the official `@anthropic-ai/sdk`, which is a
-  new dependency awaiting approval.
+- An "ask the expert" button on `/experts`. It needs a server endpoint that
+  spends the API key, and the app has no authentication yet, so a public
+  endpoint would let anyone run up the bill. Add auth first.
 - Routing is lexical. A model-assisted router can be added later, but the
   deterministic router stays as the explainable default and fallback.
