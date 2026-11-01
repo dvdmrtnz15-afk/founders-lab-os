@@ -66,6 +66,13 @@ export function WarrantPanel({
       "lease_inactive",
       "lease_scope_missing",
       "lease_tools_missing",
+      "persona_ceiling_exceeded",
+      "persona_escalation_required",
+      "persona_invalid",
+      "persona_tool_blocked",
+      "council_hold",
+      "council_invalid",
+      "council_veto",
     ].includes(blocker.code),
   );
   const flowReady =
@@ -152,14 +159,18 @@ export function WarrantPanel({
 
             {evaluation.blockers.length > 0 ? (
               <div className="mt-5 space-y-2" data-testid="warrant-blockers">
-                {evaluation.blockers.slice(0, 4).map((blocker) => (
-                  <p
-                    className="border-l border-amber-200/40 pl-3 text-xs leading-5 text-white/54"
-                    key={blocker.code}
-                  >
-                    {blocker.message}
-                  </p>
-                ))}
+                {/* Hard blocks first, so a cap of four never hides one. */}
+                {[...evaluation.blockers]
+                  .sort((a, b) => Number(b.hard) - Number(a.hard))
+                  .slice(0, 4)
+                  .map((blocker) => (
+                    <p
+                      className="border-l border-amber-200/40 pl-3 text-xs leading-5 text-white/54"
+                      key={blocker.code}
+                    >
+                      {blocker.message}
+                    </p>
+                  ))}
               </div>
             ) : (
               <p className="mt-5 border-l border-emerald-300/50 pl-3 text-xs leading-5 text-white/58">

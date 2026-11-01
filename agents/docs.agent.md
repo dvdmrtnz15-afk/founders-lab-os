@@ -14,3 +14,7 @@ Owns durable knowledge capture.
 - Docs updated.
 - Docs intentionally not updated, with reason.
 - Receipt location.
+
+## Persona Spec
+
+`role:docs` in `src/lib/persona/registry.ts`.

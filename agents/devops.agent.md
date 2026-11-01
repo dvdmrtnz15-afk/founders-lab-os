@@ -15,3 +15,7 @@ Owns CI/CD, previews, release readiness, rollback, and observability.
 - Preview status.
 - Release readiness.
 - Rollback plan.
+
+## Persona Spec
+
+`role:devops` in `src/lib/persona/registry.ts`.

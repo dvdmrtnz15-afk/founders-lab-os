@@ -1,15 +1,18 @@
 import { z } from "zod";
+import { councilSchema } from "./persona/council";
+import { personaRefSchema, personaSpecSchema } from "./persona/persona-schema";
 import { createInitialProbabilityFlowProtocol } from "./probability-flow";
 import {
   probabilityFlowProtocolSchema,
   probabilityFlowReceiptSchema,
 } from "./probability-flow-schema";
+import { warrantLevelSchema } from "./warrant-level";
 
 export const NOESIS_SCHEMA_VERSION = "1.0.0" as const;
 
 export const evidenceStatusSchema = z.enum(["verified", "pending", "failed"]);
 
-export const warrantLevelSchema = z.enum(["low", "medium", "high", "critical"]);
+export { warrantLevelSchema };
 
 export const evidenceItemSchema = z.strictObject({
   id: z.string().min(3).max(80),
@@ -47,6 +50,8 @@ export const auditEventSchema = z.strictObject({
     "workspace_imported",
     "probability_flow_resolved",
     "receipt_issued",
+    "persona_changed",
+    "council_updated",
   ]),
   message: z.string().min(3).max(300),
 });
@@ -69,6 +74,9 @@ export const receiptSchema = z.strictObject({
   authorityFingerprint: z.string().min(8).max(80).optional(),
   lease: capabilityLeaseSchema,
   probabilityFlowReceipt: probabilityFlowReceiptSchema.optional(),
+  // Present only when a persona acted; binds the receipt to its exact spec.
+  personaRef: personaRefSchema.optional(),
+  personaFingerprint: z.string().min(8).max(80).optional(),
   residualRisk: z.string().min(3).max(400),
 });
 
@@ -87,6 +95,11 @@ export const noesisWorkspaceSchema = z
     evidence: z.array(evidenceItemSchema).max(40),
     lease: capabilityLeaseSchema,
     probabilityFlow: probabilityFlowProtocolSchema.optional(),
+    // Optional acting persona. Absent means the pre-persona kernel behavior,
+    // byte-for-byte, including the authority fingerprint.
+    persona: personaSpecSchema.optional(),
+    // Optional review council. It can veto or hold; it never adds proof.
+    council: councilSchema.optional(),
     audit: z.array(auditEventSchema).max(200),
     receipts: z.array(receiptSchema).max(25),
     updatedAt: z.string().datetime(),

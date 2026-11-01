@@ -15,3 +15,7 @@ Owns system shape and long-term maintainability.
 - Affected boundaries.
 - ADR need, if any.
 - Rollback path.
+
+## Persona Spec
+
+`role:architect` in `src/lib/persona/registry.ts`.

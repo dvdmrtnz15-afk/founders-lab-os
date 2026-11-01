@@ -12,9 +12,9 @@ import {
   initialNoesisWorkspace,
   issueDryRunReceipt,
   reconcileApproval,
+  requiresHumanApproval,
   serializeWorkspace,
   stripImportedAuthority,
-  warrantPolicies,
 } from "@/lib/noesis";
 import { applyProbabilityFlowResolution } from "@/lib/probability-flow";
 import {
@@ -23,9 +23,12 @@ import {
   type EvidenceItem,
   type NoesisWorkspace,
 } from "@/lib/noesis-schema";
+import type { CouncilVote } from "@/lib/persona/council";
+import { getPersona } from "@/lib/persona/registry";
 import type { ProbabilityFlowProtocol } from "@/lib/probability-flow-schema";
 import { AuditTimeline } from "./components/audit-timeline";
 import { EvidenceLedger } from "./components/evidence-ledger";
+import { PersonaPanel } from "./components/persona-panel";
 import { ProbabilityFlowPanel } from "./components/probability-flow-panel";
 import { WarrantPanel } from "./components/warrant-panel";
 import { WorkbenchHeader } from "./components/workbench-header";
@@ -108,22 +111,19 @@ export function NoesisWorkbench() {
   function updateWorkspace(patch: Partial<NoesisWorkspace>) {
     setWorkspace((current) => {
       const now = new Date().toISOString();
-      const warrantLevel = patch.warrantLevel ?? current.warrantLevel;
+      const merged = { ...current, ...patch, updatedAt: now };
       const policyChanged = patch.warrantLevel !== undefined;
 
       return reconcileApproval(
-        {
-          ...current,
-          ...patch,
-          lease: policyChanged
-            ? {
-                ...current.lease,
-                approvalRequired:
-                  warrantPolicies[warrantLevel].requiresHumanApproval,
-              }
-            : current.lease,
-          updatedAt: now,
-        },
+        policyChanged
+          ? {
+              ...merged,
+              lease: {
+                ...merged.lease,
+                approvalRequired: requiresHumanApproval(merged),
+              },
+            }
+          : merged,
         now,
       );
     });
@@ -215,6 +215,58 @@ export function NoesisWorkbench() {
           {
             kind: "evidence_removed",
             message: `${id} removed from the ledger.`,
+          },
+          now,
+        ),
+        now,
+      );
+    });
+  }
+
+  function updatePersona(ref: string | null) {
+    setWorkspace((current) => {
+      const now = new Date().toISOString();
+      const persona = ref ? getPersona(ref) : undefined;
+      const next: NoesisWorkspace = { ...current, persona, updatedAt: now };
+      // Absent, not undefined, so the workspace serializes as persona-free.
+      if (!persona) delete next.persona;
+
+      // Changing who acts changes what an approval vouched for, and may
+      // change whether a human must approve at this tier.
+      return reconcileApproval(
+        appendAudit(
+          {
+            ...next,
+            lease: {
+              ...next.lease,
+              approvalRequired: requiresHumanApproval(next),
+            },
+          },
+          {
+            kind: "persona_changed",
+            message: persona
+              ? `${persona.displayName} (${persona.ref} v${persona.version}) is now the acting persona.`
+              : "Acting persona removed; the kernel evaluates without persona limits.",
+          },
+          now,
+        ),
+        now,
+      );
+    });
+  }
+
+  function updateCouncil(council: CouncilVote[]) {
+    setWorkspace((current) => {
+      const now = new Date().toISOString();
+      const next: NoesisWorkspace = { ...current, council, updatedAt: now };
+      if (council.length === 0) delete next.council;
+
+      return reconcileApproval(
+        appendAudit(
+          next,
+          {
+            kind: "council_updated",
+            message: `Review council now has ${council.length} vote(s).`,
           },
           now,
         ),
@@ -418,6 +470,7 @@ export function NoesisWorkbench() {
             >
               {[
                 ["01", "Define", "#definition"],
+                ["P", "Persona", "#persona"],
                 ["02", "Evidence", "#evidence"],
                 ["03", "Flow", "#probability-flow"],
                 ["04", "Audit", "#audit"],
@@ -459,6 +512,11 @@ export function NoesisWorkbench() {
             <WorkspaceEditor
               onLeaseChange={updateLease}
               onWorkspaceChange={updateWorkspace}
+              workspace={workspace}
+            />
+            <PersonaPanel
+              onCouncilChange={updateCouncil}
+              onPersonaChange={updatePersona}
               workspace={workspace}
             />
             <EvidenceLedger

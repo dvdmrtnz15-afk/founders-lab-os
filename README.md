@@ -56,7 +56,7 @@ with an audit trail is becoming a prerequisite for deployment, not a feature.
 | Leases, not standing permissions  | Authority is a capability lease with a named scope, an explicit tool list, a bounded budget, an optional expiry, and an approval flag. Issuing a receipt revokes it.                                                                                       |
 | Approval binds to content         | A human approval is bound to a fingerprint of the exact objective, state, evidence, tier, lease, and probability-flow envelope it was given for. Any change voids it, and the kernel enforces this, not just the UI. Imported files never carry authority. |
 | Fail closed                       | Missing state, expired or inactive leases, and failed evidence produce `BLOCK`. Unknown fields and malformed files are rejected at import. There is no default allow.                                                                                      |
-| Every decision is explainable     | Every non-allow decision carries typed blocker codes (19 today), split into hard blocks and soft "needs more proof" holds.                                                                                                                                 |
+| Every decision is explainable     | Every non-allow decision carries typed blocker codes (26 today), split into hard blocks and soft "needs more proof" holds.                                                                                                                                 |
 
 ## Architecture
 

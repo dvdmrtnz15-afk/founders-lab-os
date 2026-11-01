@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Added the persona substrate (`src/lib/persona/`, `docs/product/PERSONAS.md`):
+  strict persona specs with trait axes, voice rules, a governing law, a risk
+  ceiling, tool allow and block lists, and parent attenuation, adapted from
+  LYZT-AI. Workspaces may attach an acting persona and a review council; the
+  kernel adds seven blocker codes (`persona_*`, `council_*`). A council can
+  veto or hold but never adds proof. Persona-free workspaces keep their
+  authority fingerprint unchanged. Ships a reference registry (constitution
+  root, the twelve agent roles, and the SpellShimmer Oracle) and a Persona &
+  council panel on `/noesis`.
 - Landed the Invariant Probability Flow reference harness on `main` (from the
   unmerged `feat/auth-foundation` branch, without its dormant Auth.js commit or
   its Next.js upgrade).

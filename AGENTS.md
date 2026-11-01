@@ -34,6 +34,14 @@ bounded action succeeded.
 The Noesis workflow adds a warrant gate; it never replaces the stricter rule in
 this constitution or grants authority the operator did not provide.
 
+## Personas
+
+Each role in `agents/` has a typed persona spec in
+`src/lib/persona/registry.ts` (`role:<file-name>`). Every persona attenuates
+`founderlab:constitution`, which blocks pushes, production deploys, env-file
+reads, and destructive shell commands. A persona sets the most authority an
+agent may hold; it never grants authority. See `docs/product/PERSONAS.md`.
+
 ## Required Pre-Code Output
 
 No meaningful code change starts until the agent has produced:
