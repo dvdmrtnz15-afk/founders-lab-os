@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react";
 import { compileExpertBrief } from "@/lib/experts/compile";
 import { routeTask } from "@/lib/experts/router";
+import type { ExpertAccess } from "@/lib/auth/access";
 import { getPersona } from "@/lib/persona/registry";
+import { AskExpert } from "./ask-expert";
 
 const EXAMPLES = [
   "The checkout page crashes with a stack trace after the last deploy",
@@ -28,7 +30,7 @@ const warrantTone = {
   critical: "bg-[#f6d3d7] text-[#4a0f17]",
 } as const;
 
-export function ExpertDesk() {
+export function ExpertDesk({ access }: { access: ExpertAccess }) {
   const [task, setTask] = useState(EXAMPLES[0]);
   const [copied, setCopied] = useState(false);
   const route = useMemo(() => routeTask(task), [task]);
@@ -217,6 +219,13 @@ export function ExpertDesk() {
                 ))}
               </ul>
             </div>
+
+            <AskExpert
+              access={access}
+              expert={primary}
+              key={`${primary.ref}:${task}`}
+              task={task}
+            />
 
             {brief ? (
               <details className="border border-[#cbd4ce] bg-white">

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Added GitHub sign-in (Auth.js v5, pinned beta; design from the approved
+  `feat/auth-foundation` work, ADR 0002) and an "Ask the expert" button on
+  `/experts`. `POST /api/experts/consult` requires same origin, JSON, a
+  session, a GitHub id on `EXPERT_ALLOWED_GITHUB_IDS`, a valid task, and
+  per-user and daily spend limits before calling Claude; upstream errors are
+  returned generically. Added `pnpm test:live`, a real end-to-end
+  consultation excluded from `pnpm test` and CI.
 - Added live expert consultations (`src/lib/experts/node/claude-expert.ts`)
   using the official `@anthropic-ai/sdk` (new dependency, owner-approved):
   Claude Opus 5.5 with routed effort, structured output constrained to the
