@@ -222,23 +222,24 @@ product enforces.
 
 **Shipped**
 
-| Capability                                                       | Status  |
-| ---------------------------------------------------------------- | ------- |
-| Deterministic warrant kernel with four policy tiers              | Shipped |
-| Strict, versioned schemas for workspaces, leases, and receipts   | Shipped |
-| Capability leases with expiry, budget, approval, auto-revoke     | Shipped |
-| Dry-run receipts and a bounded local audit trail                 | Shipped |
-| Content-bound human approvals, enforced in the kernel            | Shipped |
-| Invariant Probability Flow reference with replayable receipts    | Shipped |
-| Portable conformance vectors for cross-runtime verification      | Shipped |
-| Encrypted local vault for Exchange workspaces                    | Shipped |
-| Provider-neutral agent skill and governor role                   | Shipped |
-| Typed personas with attenuation, review council, voice lint      | Shipped |
-| Warranted executor: preflight, verify, rollback, signed receipt  | Shipped |
-| Ed25519 signed envelopes for personas and execution receipts     | Shipped |
-| Expert Desk: explainable task routing to governed Claude experts | Shipped |
-| Live expert consultations with independent review (server-side)  | Shipped |
-| CI gate: format, 180 unit tests, lint, type-check, build         | Shipped |
+| Capability                                                          | Status  |
+| ------------------------------------------------------------------- | ------- |
+| Deterministic warrant kernel with four policy tiers                 | Shipped |
+| Strict, versioned schemas for workspaces, leases, and receipts      | Shipped |
+| Capability leases with expiry, budget, approval, auto-revoke        | Shipped |
+| Dry-run receipts and a bounded local audit trail                    | Shipped |
+| Content-bound human approvals, enforced in the kernel               | Shipped |
+| Invariant Probability Flow reference with replayable receipts       | Shipped |
+| Portable conformance vectors for cross-runtime verification         | Shipped |
+| Encrypted local vault for Exchange workspaces                       | Shipped |
+| Provider-neutral agent skill and governor role                      | Shipped |
+| Typed personas with attenuation, review council, voice lint         | Shipped |
+| Warranted executor: preflight, verify, rollback, signed receipt     | Shipped |
+| Ed25519 signed envelopes for personas and execution receipts        | Shipped |
+| Expert Desk: explainable task routing to governed Claude experts    | Shipped |
+| Live expert consultations with independent review (server-side)     | Shipped |
+| GitHub sign-in, spend allowlist, and limits for live expert answers | Shipped |
+| CI gate: format, 215 unit tests, lint, type-check, build            | Shipped |
 
 **Next: the path to a production kernel**
 
@@ -282,7 +283,9 @@ These are stated plainly so that technical review starts from facts.
   not prove who approved or resist deliberate tampering (roadmap step 1).
 - Reactivating an unchanged lease can issue another dry-run receipt without
   fresh approval. Receipts do not confer single-use execution authority.
-- There is no authentication, tenancy, or telemetry yet.
+- Authentication covers live expert answers only (GitHub sign-in plus an
+  allowlist; see `docs/architecture/AUTH.md`). There is no tenancy or
+  telemetry yet, and the rest of the app is intentionally public.
 
 ## Quick start
 

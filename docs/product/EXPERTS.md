@@ -87,10 +87,17 @@ with the official `@anthropic-ai/sdk`:
 Credentials come from the environment the SDK reads (`ANTHROPIC_API_KEY`, or
 an `ant auth login` profile). Nothing in the repository reads `.env` files.
 
+## Asking an expert from the desk
+
+Signed-in, allowlisted users see **Ask the expert** on `/experts`. It calls
+`POST /api/experts/consult`, which runs the full loop and returns the
+deliverable sections, assumptions, the reviewer's verdict, and which model
+answered. Everyone else sees why they cannot ask (not configured, signed out,
+or not on the allowlist). Gates and setup: `docs/architecture/AUTH.md`.
+
 ## Not yet built
 
-- An "ask the expert" button on `/experts`. It needs a server endpoint that
-  spends the API key, and the app has no authentication yet, so a public
-  endpoint would let anyone run up the bill. Add auth first.
 - Routing is lexical. A model-assisted router can be added later, but the
   deterministic router stays as the explainable default and fallback.
+- Answers are not streamed; a high-effort answer plus review can take a
+  minute or more.
