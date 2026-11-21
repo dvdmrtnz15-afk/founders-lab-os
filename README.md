@@ -114,11 +114,11 @@ blocker yields `blocked`. Soft blockers alone yield `verify`. No blockers yields
 ### Warrant policies
 
 | Tier     | Evidence coverage | Max uncertainty | Independent verification | Human approval |
-| -------- | -------------- | --------------- | ----------------- | -------------- |
-| Low      | 60%            | 40%             | Optional          | No             |
-| Medium   | 80%            | 25%             | Required          | No             |
-| High     | 90%            | 15%             | Required          | Required       |
-| Critical | 100%           | 10%             | Required          | Required       |
+| -------- | ----------------- | --------------- | ------------------------ | -------------- |
+| Low      | 60%               | 40%             | Optional                 | No             |
+| Medium   | 80%               | 25%             | Required                 | No             |
+| High     | 90%               | 15%             | Required                 | Required       |
+| Critical | 100%              | 10%             | Required                 | Required       |
 
 ### Receipts
 
