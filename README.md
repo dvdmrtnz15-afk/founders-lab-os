@@ -1,6 +1,8 @@
-# FounderLab OS
+<a name="founderlab-os"></a>
 
-**Proof-gated authorization for AI agents that take real actions.**
+# AI-agent authorization and review (FounderLab OS)
+
+**Policy-checked authorization for AI-agent actions.**
 
 [![CI](https://github.com/dvdmrtnz15-afk/founders-lab-os/actions/workflows/ci.yml/badge.svg)](https://github.com/dvdmrtnz15-afk/founders-lab-os/actions/workflows/ci.yml)
 
@@ -111,12 +113,12 @@ blocker yields `blocked`. Soft blockers alone yield `verify`. No blockers yields
 
 ### Warrant policies
 
-| Tier     | Proof coverage | Max uncertainty | Independent proof | Human approval |
-| -------- | -------------- | --------------- | ----------------- | -------------- |
-| Low      | 60%            | 40%             | Optional          | No             |
-| Medium   | 80%            | 25%             | Required          | No             |
-| High     | 90%            | 15%             | Required          | Required       |
-| Critical | 100%           | 10%             | Required          | Required       |
+| Tier     | Evidence coverage | Max uncertainty | Independent verification | Human approval |
+| -------- | ----------------- | --------------- | ------------------------ | -------------- |
+| Low      | 60%               | 40%             | Optional                 | No             |
+| Medium   | 80%               | 25%             | Required                 | No             |
+| High     | 90%               | 15%             | Required                 | Required       |
+| Critical | 100%              | 10%             | Required                 | Required       |
 
 ### Receipts
 
@@ -275,8 +277,8 @@ These are stated plainly so that technical review starts from facts.
   adapter has the host's privileges, so adapters must be reviewed like any
   privileged code (roadmap steps 3 and 4).
 - Probability-flow risk weights, including every psychology-facing weight, are
-  unvalidated research scaffolding. The conformance vectors prove that
-  runtimes agree, not that the weights are right.
+  unvalidated research scaffolding. The conformance vectors check agreement on their declared cases;
+  they do not establish that the weights are right.
 - Approval fingerprints detect ordinary edits to protected content, subject to
   hash collisions. Evidence observation timestamps and the probability-flow
   `forecastAsOf` stamp are excluded; freshness is not evaluated. These non-cryptographic hashes are not signatures, so they do
@@ -347,3 +349,8 @@ permission from the copyright holder.
 ---
 
 Built by David Martinez, TrueNorth Applications, Chicago.
+
+## Terminology and evidence
+
+See [Terminology and evidence](TERMINOLOGY.md) for naming, compatibility and
+evidence conventions used in new work.
